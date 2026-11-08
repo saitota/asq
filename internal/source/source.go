@@ -13,10 +13,17 @@ import (
 )
 
 const (
-	Claude  session.Source = "claude"
-	Codex   session.Source = "codex"
-	Cursor  session.Source = "cursor"
-	Copilot session.Source = "copilot"
+	Claude     session.Source = "claude"
+	Codex      session.Source = "codex"
+	Cursor     session.Source = "cursor"
+	Copilot    session.Source = "copilot"
+	Gemini     session.Source = "gemini"
+	OpenCode   session.Source = "opencode"
+	Amp        session.Source = "amp"
+	Kiro       session.Source = "kiro"
+	Pi         session.Source = "pi"
+	TraeX      session.Source = "traex"
+	AugureCode session.Source = "augure-code"
 )
 
 type Descriptor struct {
@@ -61,6 +68,57 @@ var All = []Descriptor{
 		},
 		ANSIColor: "38;2;167;139;250",
 	},
+	// The agents below and their commands follow resumeAgents in agentsview's
+	// internal/server/resume.go, the table behind its own resume menu.
+	{
+		Source: Gemini,
+		ResumeCommand: func(id string) (string, []string) {
+			return "gemini", []string{"--resume", id}
+		},
+		ANSIColor: extraColors[Gemini],
+	},
+	{
+		Source: OpenCode,
+		ResumeCommand: func(id string) (string, []string) {
+			return "opencode", []string{"--session", id}
+		},
+		ANSIColor: extraColors[OpenCode],
+	},
+	{
+		Source: Amp,
+		ResumeCommand: func(id string) (string, []string) {
+			return "amp", []string{"--resume", id}
+		},
+		ANSIColor: extraColors[Amp],
+	},
+	{
+		Source: Kiro,
+		ResumeCommand: func(id string) (string, []string) {
+			return "kiro-cli", []string{"chat", "--resume-id", id}
+		},
+		ANSIColor: extraColors[Kiro],
+	},
+	{
+		Source: Pi,
+		ResumeCommand: func(id string) (string, []string) {
+			return "pi", []string{"--session", id}
+		},
+		ANSIColor: extraColors[Pi],
+	},
+	{
+		Source: TraeX,
+		ResumeCommand: func(id string) (string, []string) {
+			return "traex", []string{"resume", id}
+		},
+		ANSIColor: extraColors[TraeX],
+	},
+	{
+		Source: AugureCode,
+		ResumeCommand: func(id string) (string, []string) {
+			return "augure", []string{"resume", id}
+		},
+		ANSIColor: DefaultANSIColor,
+	},
 }
 
 const DefaultANSIColor = "38;2;209;213;219"
@@ -68,8 +126,8 @@ const DefaultANSIColor = "38;2;209;213;219"
 // extraColors are agentsview's own dark-theme agent accents, from
 // KNOWN_AGENTS in frontend/src/lib/utils/agents.ts with hex values resolved
 // via frontend/src/app.css and kit-ui/src/lib/brand.css. Agents without an
-// agentsview color fall back to DefaultANSIColor gray. The resumable four
-// above keep asq's established colors instead.
+// agentsview color fall back to DefaultANSIColor gray. Claude, Codex, Cursor
+// and Copilot keep asq's established colors instead.
 var extraColors = map[session.Source]string{
 	"visualstudio-copilot": "38;2;96;165;250",  // blue
 	"zed":                  "38;2;74;222;128",  // green

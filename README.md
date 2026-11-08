@@ -65,15 +65,6 @@ Options:
 - `reindex --force`: refetch every conversation
 - `--cache <path>`: override the message cache location
 
-Resume is supported for these agents; sessions from other agents are listed but cannot be resumed.
-
-| Agent | Resume command |
-|---|---|
-| Claude Code | `claude --resume <id>` |
-| Codex CLI | `codex resume <id>` |
-| Cursor CLI | `cursor-agent --resume=<id>` |
-| GitHub Copilot CLI | `copilot --resume=<id>` |
-
 ## Design
 
 [DESIGN](DESIGN/) describes how asq works, and [ADR](ADR/) records why (both in Japanese).

@@ -1,6 +1,6 @@
 # セッションの取得を agentsview に委ねる
 
-- 状態: 採用（[0002](0002-native-parsers-and-index.md) を置き換え）
+- 状態: 採用（[0002](0002-native-parsers-and-index.md) を置き換え。resume の対象は [0008](0008-resume-agents-from-agentsview.md) で広げた）
 - 日付: 2026-09-01
 - 関連: [今の仕組み](../DESIGN/agentsview.md)
 
