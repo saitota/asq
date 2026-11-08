@@ -23,7 +23,7 @@
 
 `pick` と `resume` は、次の同じ手順でエージェントの CLI を起動する。
 
-1. `source` の登録簿から argv を得る。登録の無いエージェントは resume できない
+1. `source` の登録簿から argv を得る。登録の無いエージェントは resume できない。Claude Code・Codex・Cursor・Copilot 以外の登録は、agentsview の `internal/server/resume.go` の `resumeAgents` に合わせる
 2. ID が登録簿の規則（既定は `^[A-Za-z0-9._-]+$`）に合うか確かめる
 3. cwd が分かっていて、実在するディレクトリか確かめる
 4. コマンドを PATH から探し、cwd と argv を stderr に出し、cwd で子プロセスとして実行する

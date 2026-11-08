@@ -37,7 +37,7 @@ func TestGetUnknownSource(t *testing.T) {
 }
 
 func TestNonResumableAgentsStillGetAccentColors(t *testing.T) {
-	for _, agent := range []string{"gemini", "cowork", "qwen"} {
+	for _, agent := range []string{"cowork", "qwen", "kimi"} {
 		if got := ANSIColor(session.Source(agent)); got == DefaultANSIColor || got == "" {
 			t.Fatalf("%s: expected an accent color, got %q", agent, got)
 		}
@@ -52,8 +52,8 @@ func TestNonResumableAgentsStillGetAccentColors(t *testing.T) {
 }
 
 func TestResumeChecksUnsupportedBeforeID(t *testing.T) {
-	_, _, err := Resume("gemini", "bad id")
-	if err == nil || err.Error() != "resume is not supported for gemini sessions" {
+	_, _, err := Resume("cowork", "bad id")
+	if err == nil || err.Error() != "resume is not supported for cowork sessions" {
 		t.Fatalf("got %v", err)
 	}
 }
