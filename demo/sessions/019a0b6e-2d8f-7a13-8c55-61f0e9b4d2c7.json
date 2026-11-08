@@ -1,0 +1,9 @@
+{
+  "last_ordinal": 3,
+  "messages": [
+    {"role": "user", "timestamp": "2026-11-07T15:02:00Z", "content": "Split the session middleware so token refresh lives in one place."},
+    {"role": "assistant", "timestamp": "2026-11-07T15:20:00Z", "content": "Moved refresh into auth.Refresher. Both the HTTP and gRPC middlewares now call it, and the duplicated expiry check is gone."},
+    {"role": "user", "timestamp": "2026-11-07T16:31:00Z", "content": "Add a test for a refresh that races with logout."},
+    {"role": "assistant", "timestamp": "2026-11-07T16:40:00Z", "content": "Added TestRefreshAfterLogout. Logout now wins: the refreshed token is discarded."}
+  ]
+}

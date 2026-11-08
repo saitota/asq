@@ -1,0 +1,19 @@
+#!/bin/sh
+# Stands in for agentsview so the recording only ever shows demo/sessions.
+dir=$(dirname "$0")/../sessions
+case "$1 $2" in
+"session list")
+  cat "$dir/list.json" ;;
+"session messages")
+  from=0
+  prev=
+  for arg; do
+    if [ "$prev" = --from ]; then from=$arg; fi
+    prev=$arg
+  done
+  if [ "$from" = 0 ]; then cat "$dir/$3.json"
+  else echo '{"messages":[],"last_ordinal":'"$from"'}'; fi ;;
+*)
+  echo "demo agentsview: unsupported command: $*" >&2
+  exit 1 ;;
+esac

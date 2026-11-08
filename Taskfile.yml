@@ -1,0 +1,101 @@
+version: '3'
+
+vars:
+  BINARY: asq
+  DIST: dist
+  ARCHIVE: asq-darwin-arm64.zip
+  INSTALL_DIR: '{{.HOME}}/.local/bin'
+  REPO: saitota/asq
+  MODULE: asq
+  RELEASE_PREFIX: v0.1.
+  VERSION: '{{.VERSION | default "dev"}}'
+  BUILD_DATE:
+    sh: date -u +%Y-%m-%dT%H:%M:%SZ
+
+tasks:
+  default: { cmds: [task --list] }
+
+  build:
+    desc: バイナリビルド
+    deps: [test]
+    cmds:
+      - mkdir -p {{.DIST}}
+      - GOOS=darwin GOARCH=arm64 go build -ldflags "-X {{.MODULE}}/internal/buildinfo.Version={{.VERSION}} -X {{.MODULE}}/internal/buildinfo.BuildDate={{.BUILD_DATE}}" -o {{.DIST}}/{{.BINARY}} ./cmd/asq
+      - '{{.DIST}}/{{.BINARY}} version'
+
+  test:
+    desc: テスト実行
+    cmds:
+      - go test ./...
+
+  vet:
+    desc: 静的検査
+    cmds:
+      - go vet ./...
+
+  demo:
+    desc: ダミーデータで demo/demo.gif を録画する（Docker と ffmpeg が必要）
+    cmds:
+      - GOOS=linux go build -o {{.DIST}}/demo/asq ./cmd/asq
+      - docker run --rm -v "$PWD:/vhs" ghcr.io/charmbracelet/vhs:v0.12.1 demo/demo.tape
+      - ffmpeg -v error -y -i {{.DIST}}/demo/demo.mp4 -vf "split[a][b];[a]palettegen=stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle" demo/demo.gif
+
+  clean:
+    desc: ローカルファイル削除
+    cmds:
+      - rm -rf {{.DIST}} {{.BINARY}}
+      - echo "Cleaned up"
+
+  check:
+    desc: ビルドとテスト
+    cmds:
+      - task: build
+      - task: test
+      - task: vet
+
+  install-local:
+    desc: 現在のブランチをビルドして ~/.local/bin に配置
+    vars:
+      VERSION:
+        sh: echo "local-$(git branch --show-current)-$(git rev-parse --short HEAD)"
+    deps: [test]
+    cmds:
+      - mkdir -p {{.INSTALL_DIR}} {{.DIST}}
+      - go build -ldflags "-X {{.MODULE}}/internal/buildinfo.Version={{.VERSION}} -X {{.MODULE}}/internal/buildinfo.BuildDate={{.BUILD_DATE}}" -o {{.DIST}}/{{.BINARY}} ./cmd/asq
+      - install -m 0755 {{.DIST}}/{{.BINARY}} {{.INSTALL_DIR}}/{{.BINARY}}
+      - '{{.INSTALL_DIR}}/{{.BINARY}} version'
+
+  package:
+    desc: バイナリをビルドしてzip化
+    cmds:
+      - task: build
+        vars: { VERSION: '{{.VERSION}}' }
+      - cd {{.DIST}} && zip -q -j {{.ARCHIVE}} {{.BINARY}}
+
+  release:
+    desc: 'GitHub Releaseを作成する。TAG未指定なら{{.RELEASE_PREFIX}}<N>を自動採番'
+    vars:
+      RESOLVED_TAG:
+        sh: |
+          if [ -n "{{.TAG}}" ]; then echo "{{.TAG}}"; exit; fi
+          next=$(gh release list --repo {{.REPO}} --limit 100 --json tagName --jq '.[].tagName' \
+            | awk -F. -v p='{{.RELEASE_PREFIX}}' 'index($0,p)==1 && $NF ~ /^[0-9]+$/ {print $NF+0}' \
+            | sort -n | tail -1)
+          echo "{{.RELEASE_PREFIX}}$((${next:--1} + 1))"
+    cmds:
+      - test -z "$(git status --porcelain)" || { echo "worktree is dirty"; exit 1; }
+      - task: package
+        vars: { VERSION: '{{.RESOLVED_TAG}}' }
+      - gh release create {{.RESOLVED_TAG}} {{.DIST}}/{{.ARCHIVE}} --repo {{.REPO}} --title {{.RESOLVED_TAG}} --target $(git rev-parse HEAD) --generate-notes
+      - git fetch origin tag {{.RESOLVED_TAG}}
+
+  install:
+    desc: 'GitHub Releaseから ~/.local/bin に配置。Usage: task install [TAG=v0.1.x]'
+    vars:
+      TAG: '{{.TAG | default ""}}'
+    cmds:
+      - mkdir -p {{.INSTALL_DIR}} {{.DIST}}/install
+      - gh release download {{.TAG}} --repo {{.REPO}} --pattern {{.ARCHIVE}} --dir {{.DIST}}/install --clobber
+      - unzip -q -o {{.DIST}}/install/{{.ARCHIVE}} -d {{.DIST}}/install
+      - install -m 0755 {{.DIST}}/install/{{.BINARY}} {{.INSTALL_DIR}}/{{.BINARY}}
+      - '{{.INSTALL_DIR}}/{{.BINARY}} version'

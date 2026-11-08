@@ -1,0 +1,9 @@
+{
+  "last_ordinal": 3,
+  "messages": [
+    {"role": "user", "timestamp": "2026-11-06T13:48:00Z", "content": "terraform plan shows drift on the load balancer every run. Why?"},
+    {"role": "assistant", "timestamp": "2026-11-06T13:55:00Z", "content": "The provider returns the listener rules in a different order than the config declares them, so every plan sees a change."},
+    {"role": "user", "timestamp": "2026-11-06T14:10:00Z", "content": "Can we fix it without ignore_changes?"},
+    {"role": "assistant", "timestamp": "2026-11-06T14:22:00Z", "content": "Yes. Giving each rule an explicit priority makes the order stable. The plan is clean now."}
+  ]
+}

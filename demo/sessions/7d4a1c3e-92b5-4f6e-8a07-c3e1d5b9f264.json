@@ -1,0 +1,7 @@
+{
+  "last_ordinal": 1,
+  "messages": [
+    {"role": "user", "timestamp": "2026-11-05T09:58:00Z", "content": "Draft release notes from the commits since v0.4.0."},
+    {"role": "assistant", "timestamp": "2026-11-05T10:15:00Z", "content": "Grouped 23 commits into Features, Fixes and Internal. The breaking change to --format is called out at the top."}
+  ]
+}

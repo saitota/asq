@@ -1,0 +1,7 @@
+{
+  "last_ordinal": 1,
+  "messages": [
+    {"role": "user", "timestamp": "2026-11-03T08:31:00Z", "content": "--limit 0 should mean unlimited, not zero rows."},
+    {"role": "assistant", "timestamp": "2026-11-03T08:57:00Z", "content": "Changed the flag so 0 means no limit, and documented it in --help."}
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "last_ordinal": 3,
+  "messages": [
+    {"role": "user", "timestamp": "2026-11-04T12:44:00Z", "content": "Add a token bucket rate limiter to the public endpoints."},
+    {"role": "assistant", "timestamp": "2026-11-04T13:02:00Z", "content": "Added ratelimit.Bucket keyed by API token: 50 requests per second with a burst of 100. Over the limit returns 429 with Retry-After."},
+    {"role": "user", "timestamp": "2026-11-04T13:21:00Z", "content": "Exempt the health check."},
+    {"role": "assistant", "timestamp": "2026-11-04T13:30:00Z", "content": "/healthz now skips the limiter."}
+  ]
+}

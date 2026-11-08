@@ -1,0 +1,9 @@
+{
+  "last_ordinal": 3,
+  "messages": [
+    {"role": "user", "timestamp": "2026-11-07T10:20:00Z", "content": "Add a dark mode toggle that remembers the user's choice."},
+    {"role": "assistant", "timestamp": "2026-11-07T10:34:00Z", "content": "Added ThemeToggle to the header. It starts from prefers-color-scheme and saves the choice in localStorage."},
+    {"role": "user", "timestamp": "2026-11-07T10:52:00Z", "content": "The page flashes white before the theme loads."},
+    {"role": "assistant", "timestamp": "2026-11-07T11:05:00Z", "content": "Moved the theme check into an inline script in <head>, so the class is set before first paint."}
+  ]
+}

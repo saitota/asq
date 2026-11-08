@@ -1,0 +1,2 @@
+#!/bin/sh
+printf '\n\033[38;2;245;158;11m✻\033[0m claude %s %s\n  \033[2min %s (demo stub)\033[0m\n\n' "$1" "$2" "$PWD"

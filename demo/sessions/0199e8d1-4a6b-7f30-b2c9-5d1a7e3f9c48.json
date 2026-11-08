@@ -1,0 +1,9 @@
+{
+  "last_ordinal": 3,
+  "messages": [
+    {"role": "user", "timestamp": "2026-11-05T18:55:00Z", "content": "The deploy job loops forever when the registry is down. Add exponential backoff and give up after 5 tries."},
+    {"role": "assistant", "timestamp": "2026-11-05T19:10:00Z", "content": "The push step now waits 2s, 4s, 8s, 16s and fails the job after the fifth attempt with the registry's last error."},
+    {"role": "user", "timestamp": "2026-11-05T19:40:00Z", "content": "Add jitter so parallel jobs don't push at the same moment."},
+    {"role": "assistant", "timestamp": "2026-11-05T19:48:00Z", "content": "Added up to 20% random jitter to each wait."}
+  ]
+}
