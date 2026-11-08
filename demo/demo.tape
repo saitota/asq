@@ -44,4 +44,6 @@ Sleep 1.8s
 Type@150ms " ci"
 Sleep 2.5s
 Enter
-Sleep 4s
+Sleep 2.5s
+Type@80ms "Run it with -race too, then push."
+Sleep 3s

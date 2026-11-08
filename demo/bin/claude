@@ -1,2 +1,46 @@
-#!/bin/sh
-printf '\n\033[38;2;245;158;11m✻\033[0m claude %s %s\n  \033[2min %s (demo stub)\033[0m\n\n' "$1" "$2" "$PWD"
+#!/bin/bash
+# Stands in for the agent CLI: redraws the resumed demo session full screen and waits at its prompt.
+# The sed parsing relies on demo/sessions keeping one JSON object per line.
+dir=$(dirname "$0")/../sessions
+id=$2
+cols=$(tput cols)
+width=$((cols - 4))
+accent=$'\e[38;2;245;158;11m'
+dim=$'\e[38;2;147;153;178m'
+reset=$'\e[0m'
+
+rule() { printf '%s%s' "$1" "$(printf '─%.0s' $(seq 3 "$cols"))"; printf '%s\n' "$2"; }
+boxline() { printf '│ %s%*s│\n' "$1" $((cols - 3 - ${#2})) ''; }
+
+field() { sed -n "/\"$id\"/s/.*\"$1\": \"\([^\"]*\)\".*/\1/p" "$dir/list.json"; }
+name=$(field display_name)
+where="${PWD/#$HOME/\~} · $(field git_branch)"
+
+printf '\e[?1049h\e[H\e[2J'
+rule '╭' '╮'
+# The second argument is only measured for padding, so ASCII stand-ins keep the width right without a UTF-8 locale.
+boxline "${accent}✻${reset} Resumed ${name}" "* Resumed ${name}"
+boxline "  ${dim}${where}${reset}" "  ${where/·/-}"
+rule '╰' '╯'
+echo
+
+while IFS= read -r line; do
+  role=$(sed -n 's/.*"role": "\([a-z]*\)".*/\1/p' <<<"$line")
+  [ -n "$role" ] || continue
+  content=$(sed -n 's/.*"content": "\(.*\)"}.*/\1/p' <<<"$line")
+  if [ "$role" = user ]; then marker="${dim}>${reset}" color=$dim; else marker="●" color=''; fi
+  first=1
+  while IFS= read -r wrapped; do
+    if [ $first = 1 ]; then printf '%s %s%s%s\n' "$marker" "$color" "$wrapped" "$reset"; first=0
+    else printf '  %s%s%s\n' "$color" "$wrapped" "$reset"; fi
+  done < <(fold -s -w "$width" <<<"$content")
+  echo
+done < "$dir/$id.json"
+
+rule '╭' '╮'
+boxline '>' '>'
+rule '╰' '╯'
+printf '  %s? for shortcuts%s' "$dim" "$reset"
+printf '\e[2A\e[5G'
+read -r _
+printf '\e[?1049l'
