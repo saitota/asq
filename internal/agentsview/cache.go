@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"asq/internal/session"
+	"github.com/saitota/asq/internal/session"
 )
 
 // The cache is disposable: a missing, corrupt, or outdated file only costs

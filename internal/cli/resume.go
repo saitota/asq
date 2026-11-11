@@ -9,8 +9,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"asq/internal/session"
-	"asq/internal/source"
+	"github.com/saitota/asq/internal/session"
+	"github.com/saitota/asq/internal/source"
 )
 
 func (a App) resume(args []string) error {

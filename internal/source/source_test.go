@@ -3,7 +3,7 @@ package source
 import (
 	"testing"
 
-	"asq/internal/session"
+	"github.com/saitota/asq/internal/session"
 )
 
 func TestAllDescriptorsAreComplete(t *testing.T) {

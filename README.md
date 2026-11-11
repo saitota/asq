@@ -16,7 +16,13 @@ unzip asq-darwin-arm64.zip
 install -m 0755 asq ~/.local/bin/asq
 ```
 
-Or build from source (Go 1.25+):
+Or install with Go (1.25+):
+
+```sh
+go install github.com/saitota/asq/cmd/asq@latest
+```
+
+Or build from a clone:
 
 ```sh
 go build -o asq ./cmd/asq

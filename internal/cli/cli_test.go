@@ -13,12 +13,12 @@ import (
 	"testing"
 	"time"
 
-	"asq/internal/agentsviewtest"
-	"asq/internal/ansitext"
-	"asq/internal/session"
-	"asq/internal/source"
-	"asq/internal/tui"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/saitota/asq/internal/agentsviewtest"
+	"github.com/saitota/asq/internal/ansitext"
+	"github.com/saitota/asq/internal/session"
+	"github.com/saitota/asq/internal/source"
+	"github.com/saitota/asq/internal/tui"
 )
 
 func stubSession(id, agent, name, cwd, firstMessage string) map[string]any {

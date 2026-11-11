@@ -1,4 +1,4 @@
-module asq
+module github.com/saitota/asq
 
 go 1.25.0
 

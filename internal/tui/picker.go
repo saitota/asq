@@ -10,9 +10,9 @@ import (
 	"os"
 	"strings"
 
-	"asq/internal/ansitext"
 	tea "charm.land/bubbletea/v2"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/saitota/asq/internal/ansitext"
 )
 
 // Item is one selectable row. Display may contain ANSI colors; Haystack is

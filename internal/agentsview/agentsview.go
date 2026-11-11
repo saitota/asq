@@ -19,7 +19,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"asq/internal/session"
+	"github.com/saitota/asq/internal/session"
 )
 
 // EnvBin overrides the agentsview binary name, mainly for tests.

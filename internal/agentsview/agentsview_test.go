@@ -7,8 +7,8 @@ import (
 	"sync"
 	"testing"
 
-	"asq/internal/agentsviewtest"
-	"asq/internal/session"
+	"github.com/saitota/asq/internal/agentsviewtest"
+	"github.com/saitota/asq/internal/session"
 )
 
 type recordingReporter struct {

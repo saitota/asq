@@ -4,9 +4,9 @@ import (
 	"errors"
 	"strings"
 
-	"asq/internal/ansitext"
-	"asq/internal/session"
-	"asq/internal/tui"
+	"github.com/saitota/asq/internal/ansitext"
+	"github.com/saitota/asq/internal/session"
+	"github.com/saitota/asq/internal/tui"
 )
 
 // Field budgets keep every picker column visible in the list pane: the path

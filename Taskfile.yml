@@ -6,7 +6,7 @@ vars:
   ARCHIVE: asq-darwin-arm64.zip
   INSTALL_DIR: '{{.HOME}}/.local/bin'
   REPO: saitota/asq
-  MODULE: asq
+  MODULE: github.com/saitota/asq
   RELEASE_PREFIX: v0.1.
   VERSION: '{{.VERSION | default "dev"}}'
   BUILD_DATE:

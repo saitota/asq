@@ -6,11 +6,11 @@ import (
 	"os"
 	"strconv"
 
-	"asq/internal/ansitext"
-	"asq/internal/session"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
 	"github.com/charmbracelet/x/term"
+	"github.com/saitota/asq/internal/ansitext"
+	"github.com/saitota/asq/internal/session"
 )
 
 const defaultTableWidth = 120

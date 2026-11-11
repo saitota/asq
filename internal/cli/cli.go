@@ -8,12 +8,12 @@ import (
 	"io"
 	"os"
 
-	"asq/internal/agentsview"
-	"asq/internal/buildinfo"
-	"asq/internal/progress"
-	"asq/internal/session"
-	"asq/internal/source"
-	"asq/internal/tui"
+	"github.com/saitota/asq/internal/agentsview"
+	"github.com/saitota/asq/internal/buildinfo"
+	"github.com/saitota/asq/internal/progress"
+	"github.com/saitota/asq/internal/session"
+	"github.com/saitota/asq/internal/source"
+	"github.com/saitota/asq/internal/tui"
 )
 
 const defaultListLimit = 50
