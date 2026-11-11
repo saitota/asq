@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"asq/internal/session"
+	"github.com/saitota/asq/internal/session"
 )
 
 const goldenCacheJSON = `{"version":2,"entries":{"codex:0000-1111":{"signature":"sig-1","session":{"id":"0000-1111","source":"codex","name":"tfupdate-series","cwd":"/tmp/proj","git_branch":"main","timestamp":"2026-09-01T03:06:13Z","messages":[{"role":"user","content":"PRつくって","timestamp":"2026-08-31T09:42:43Z"},{"role":"assistant","content":"作りました","timestamp":"2026-08-31T09:43:00Z"}]}}}}`

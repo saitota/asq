@@ -8,8 +8,8 @@ package cli
 import (
 	"strings"
 
-	"asq/internal/ansitext"
-	"asq/internal/session"
+	"github.com/saitota/asq/internal/ansitext"
+	"github.com/saitota/asq/internal/session"
 )
 
 // The session ID is deliberately the last field so that when a whole line is

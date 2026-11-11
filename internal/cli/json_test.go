@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"asq/internal/session"
-	"asq/internal/source"
+	"github.com/saitota/asq/internal/session"
+	"github.com/saitota/asq/internal/source"
 )
 
 func TestListOutputEncoding(t *testing.T) {

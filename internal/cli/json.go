@@ -3,7 +3,7 @@ package cli
 import (
 	"time"
 
-	"asq/internal/session"
+	"github.com/saitota/asq/internal/session"
 )
 
 type listOutput struct {

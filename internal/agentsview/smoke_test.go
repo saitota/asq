@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"asq/internal/session"
-	"asq/internal/source"
+	"github.com/saitota/asq/internal/session"
+	"github.com/saitota/asq/internal/source"
 )
 
 // TestSmokeAgainstRealAgentsview guards the contract this package assumes of

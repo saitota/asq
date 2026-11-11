@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"asq/internal/session"
-	"asq/internal/source"
+	"github.com/saitota/asq/internal/session"
+	"github.com/saitota/asq/internal/source"
 )
 
 func TestSelectionLineFieldsMatchProtocolCount(t *testing.T) {

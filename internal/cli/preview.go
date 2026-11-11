@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"asq/internal/session"
-	"asq/internal/source"
+	"github.com/saitota/asq/internal/session"
+	"github.com/saitota/asq/internal/source"
 )
 
 const previewMessageLimit = 80

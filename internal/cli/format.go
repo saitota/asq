@@ -4,8 +4,8 @@ import (
 	"os"
 	"strings"
 
-	"asq/internal/session"
-	"asq/internal/source"
+	"github.com/saitota/asq/internal/session"
+	"github.com/saitota/asq/internal/source"
 )
 
 const displayTimeFormat = "2006-01-02T15:04:05Z07:00"

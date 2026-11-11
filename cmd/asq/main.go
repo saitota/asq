@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"asq/internal/cli"
+	"github.com/saitota/asq/internal/cli"
 )
 
 func main() {

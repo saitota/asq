@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"strings"
 
-	"asq/internal/session"
+	"github.com/saitota/asq/internal/session"
 )
 
 const (
