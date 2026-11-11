@@ -11,6 +11,7 @@ import (
 	"github.com/charmbracelet/x/term"
 	"github.com/saitota/asq/internal/ansitext"
 	"github.com/saitota/asq/internal/session"
+	"github.com/saitota/asq/internal/source"
 )
 
 const defaultTableWidth = 120
@@ -32,7 +33,7 @@ const tableSnippetPreTruncateMultiplier = 2
 // Session IDs are shortened for display only; lookups still resolve against full IDs.
 const shortSessionIDLength = 12
 
-func writeSessionTable(w io.Writer, sessions []session.Session) error {
+func writeSessionTable(w io.Writer, reg source.Registry, sessions []session.Session) error {
 	if len(sessions) == 0 {
 		_, err := fmt.Fprintln(w, "No sessions found")
 		return err
@@ -45,7 +46,7 @@ func writeSessionTable(w io.Writer, sessions []session.Session) error {
 	for _, sess := range sessions {
 		label := ansitext.TruncateEnd(sessionLabel(sess, matcher), layout.SessionWidth)
 		if color {
-			label = colorSourceInLabel(label, sess.Source)
+			label = colorSourceInLabel(reg, label, sess.Source)
 		}
 		rows = append(rows, []string{
 			label,

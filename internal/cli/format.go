@@ -15,20 +15,20 @@ func colorEnabled() bool {
 	return os.Getenv("NO_COLOR") == ""
 }
 
-func colorSource(src session.Source, value string) string {
+func colorSource(reg source.Registry, src session.Source, value string) string {
 	if !colorEnabled() {
 		return value
 	}
-	return "\x1b[" + source.ANSIColor(src) + "m" + value + "\x1b[0m"
+	return "\x1b[" + reg.ANSIColor(src) + "m" + value + "\x1b[0m"
 }
 
-func colorSourceInLabel(label string, src session.Source) string {
+func colorSourceInLabel(reg source.Registry, label string, src session.Source) string {
 	sourceText := string(src)
 	index := strings.Index(label, sourceText)
 	if index < 0 {
 		return label
 	}
-	return label[:index] + colorSource(src, sourceText) + label[index+len(sourceText):]
+	return label[:index] + colorSource(reg, src, sourceText) + label[index+len(sourceText):]
 }
 
 func tildePath(path string) string {

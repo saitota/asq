@@ -10,7 +10,7 @@ asq は、agentsview が集めたコーディングエージェントのセッ�
 | `internal/tui` | 対話ピッカー |
 | `internal/agentsview` | agentsview からの取得とメッセージキャッシュ。保存形式は `cache.go` にだけ置く |
 | `internal/progress` | 同期進捗と警告の stderr 描画 |
-| `internal/source` | 表示色と、resume できるエージェントの登録簿（argv と ID の検証）。`session.Source` で分岐するのはここだけ |
+| `internal/source` | 表示色と、resume できるエージェントの登録簿（argv と ID の検証）。組み込みの表にユーザー定義ファイルを重ねる。`session.Source` で分岐するのはここだけ |
 | `internal/session` | 共通モデル、正規化、絞り込み、ID 解決、cwd の一致判定 |
 | `internal/ansitext` | ANSI エスケープの除去と、ANSI を含む文字列の幅計算・切り詰め・折り返し・幅揃え。エスケープの文法を知るのはここだけ |
 | `internal/buildinfo` | バージョン表示 |

@@ -21,6 +21,26 @@ import (
 	"github.com/saitota/asq/internal/tui"
 )
 
+func TestMain(m *testing.M) {
+	os.Exit(runTests(m))
+}
+
+// runTests points the agents file at a path nothing writes to, so no test can
+// pick up the developer's own agents.json.
+func runTests(m *testing.M) int {
+	dir, err := os.MkdirTemp("", "asq-cli-test")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+	defer func() { _ = os.RemoveAll(dir) }()
+	if err := os.Setenv(source.EnvAgentsFile, filepath.Join(dir, "agents.json")); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+	return m.Run()
+}
+
 func stubSession(id, agent, name, cwd, firstMessage string) map[string]any {
 	return agentsviewtest.Session(id, agent, name, cwd, firstMessage)
 }
@@ -319,7 +339,7 @@ func TestSessionTableStaysWithinConfiguredWidth(t *testing.T) {
 			Content: "これは横幅を壊しやすい日本語を含むとても長いメッセージです",
 		}},
 	}}
-	if err := writeSessionTable(&stdout, sessions); err != nil {
+	if err := writeSessionTable(&stdout, source.Builtin(), sessions); err != nil {
 		t.Fatalf("writeSessionTable err = %v", err)
 	}
 	for _, line := range strings.Split(strings.TrimRight(stdout.String(), "\n"), "\n") {
@@ -360,7 +380,7 @@ func TestFZFLineColorsOnlySource(t *testing.T) {
 			Content: "deep hidden match",
 		}},
 	}
-	line := newSelectionLine(sess, true).encode()
+	line := newSelectionLine(source.Builtin(), sess, true).encode()
 	fields := strings.Split(line, "\t")
 	if len(fields) != fzfFieldCount {
 		t.Fatalf("fields = %d line=%q", len(fields), line)
@@ -399,7 +419,7 @@ func TestFZFLineStripsANSIFromHiddenSearchText(t *testing.T) {
 			Content: "before \x1b[0m exposed",
 		}},
 	}
-	fields := strings.Split(newSelectionLine(sess, true).encode(), "\t")
+	fields := strings.Split(newSelectionLine(source.Builtin(), sess, true).encode(), "\t")
 	searchText := strings.TrimPrefix(fields[fzfSearchTextField], ansiConcealStart)
 	searchText = strings.TrimSuffix(searchText, ansiConcealEnd)
 	if ansitext.Strip(searchText) != searchText {
@@ -616,11 +636,11 @@ func TestPickerLineUsesColorMarkerAndBudgets(t *testing.T) {
 			Content: "hello picker",
 		}},
 	}
-	line := pickerLine(sess)
+	line := pickerLine(source.Builtin(), sess)
 	if strings.Contains(line, "claude") {
 		t.Fatalf("picker line should encode the source as color, got %q", line)
 	}
-	if !strings.Contains(line, "●") || !strings.Contains(line, source.ANSIColor(source.Claude)) {
+	if !strings.Contains(line, "●") || !strings.Contains(line, source.Builtin().ANSIColor(source.Claude)) {
 		t.Fatalf("picker line missing colored marker: %q", line)
 	}
 	if !strings.Contains(line, "...") {
@@ -637,7 +657,7 @@ func TestPickerLineUsesColorMarkerAndBudgets(t *testing.T) {
 func TestPickerLineFallsBackToSourceTextWithoutColor(t *testing.T) {
 	t.Setenv("NO_COLOR", "1")
 	sess := session.Session{Source: source.Codex, CWD: "/tmp"}
-	line := pickerLine(sess)
+	line := pickerLine(source.Builtin(), sess)
 	if !strings.Contains(line, "codex") || strings.Contains(line, "●") {
 		t.Fatalf("expected text source without colors, got %q", line)
 	}
@@ -655,8 +675,8 @@ func TestPickerPreviewTextDrawsMetaBars(t *testing.T) {
 			{Role: session.RoleAssistant, Content: "answer text"},
 		},
 	}
-	got := pickerPreviewText(sess)
-	claudeRGB := strings.TrimPrefix(source.ANSIColor(source.Claude), "38;2;")
+	got := pickerPreviewText(source.Builtin(), sess)
+	claudeRGB := strings.TrimPrefix(source.Builtin().ANSIColor(source.Claude), "38;2;")
 	for _, want := range []string{
 		"\x1b[38;2;" + previewMetaBg + "mclaude sid\x1b[0m",
 		"\x1b[38;2;" + previewMetaBg + "mname: Named\x1b[0m",
@@ -680,7 +700,7 @@ func TestPickerPreviewTextPlainWithoutColor(t *testing.T) {
 		CWD:      "/tmp",
 		Messages: []session.Message{{Role: session.RoleUser, Content: "hello"}},
 	}
-	if got := pickerPreviewText(sess); strings.Contains(got, "\x1b[") {
+	if got := pickerPreviewText(source.Builtin(), sess); strings.Contains(got, "\x1b[") {
 		t.Fatalf("expected plain preview with NO_COLOR:\n%q", got)
 	}
 }
@@ -729,7 +749,7 @@ func TestPickerPreviewTextAndPreviewTextShareLayout(t *testing.T) {
 		Errors:    []string{"warning one", "warning two"},
 		Messages:  messages,
 	}
-	colored := ansitext.Strip(pickerPreviewText(sess))
+	colored := ansitext.Strip(pickerPreviewText(source.Builtin(), sess))
 	plain := sanitizePreview(previewText(sess))
 	if colored != plain {
 		t.Fatalf("colored preview stripped = %q, want %q", colored, plain)

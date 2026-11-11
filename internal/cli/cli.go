@@ -24,6 +24,8 @@ type App struct {
 	Stdin  io.Reader
 	// Pick chooses one item interactively; tests may replace it.
 	Pick func(items []tui.Item, preview func(index int) string, query string) (int, error)
+
+	sources source.Registry
 }
 
 func New() App {
@@ -31,6 +33,15 @@ func New() App {
 }
 
 func (a App) Run(args []string) error {
+	if len(args) > 0 {
+		switch args[0] {
+		case "version", "-v", "--version":
+			return a.version()
+		case "help", "-h", "--help":
+			return a.usage()
+		}
+	}
+	a.sources = a.loadSources()
 	if len(args) == 0 {
 		return a.pick(nil)
 	}
@@ -47,13 +58,18 @@ func (a App) Run(args []string) error {
 		return a.cwd(args[1:])
 	case "preview":
 		return a.preview(args[1:])
-	case "version", "-v", "--version":
-		return a.version()
-	case "help", "-h", "--help":
-		return a.usage()
 	default:
 		return a.pick(args)
 	}
+}
+
+func (a App) loadSources() source.Registry {
+	reg, err := source.Load()
+	if err != nil {
+		_, _ = fmt.Fprintf(a.Stderr, "asq: ignoring user-defined agents: %v\n", err)
+		return source.Builtin()
+	}
+	return reg
 }
 
 func (a App) usage() error {
@@ -99,7 +115,7 @@ func (a App) reindex(args []string) error {
 func (a App) list(args []string) error {
 	fs := flag.NewFlagSet("list", flag.ContinueOnError)
 	fs.SetOutput(a.Stderr)
-	sourceFlag := fs.String("source", "", "source filter, e.g. "+source.List())
+	sourceFlag := fs.String("source", "", "source filter, e.g. "+a.sources.List())
 	cachePath := fs.String("cache", "", "message cache path")
 	cwd := fs.String("cwd", "", "cwd substring filter")
 	allDirs := fs.Bool("all", false, "show sessions from all directories")
@@ -154,7 +170,7 @@ func (a App) list(args []string) error {
 	}
 	for _, sess := range sessions {
 		if *fzfOut {
-			_, _ = fmt.Fprintln(a.Stdout, newSelectionLine(sess, true).encode())
+			_, _ = fmt.Fprintln(a.Stdout, newSelectionLine(a.sources, sess, true).encode())
 			continue
 		}
 		if *verbose {
@@ -165,7 +181,7 @@ func (a App) list(args []string) error {
 	if *fzfOut || *verbose {
 		return nil
 	}
-	return writeSessionTable(a.Stdout, sessions)
+	return writeSessionTable(a.Stdout, a.sources, sessions)
 }
 
 func (a App) cwd(args []string) error {

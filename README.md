@@ -65,6 +65,24 @@ Options:
 - `reindex --force`: refetch every conversation
 - `--cache <path>`: override the message cache location
 
+## Resume more agents
+
+asq resumes the agents it has a built-in command for. To add an agent or change a command, list it in `agents.json`. asq reads `$ASQ_AGENTS_FILE`, or `asq/agents.json` in your user config directory (`~/Library/Application Support` on macOS, `$XDG_CONFIG_HOME` or `~/.config` elsewhere) when that is unset.
+
+```json
+{
+  "agents": [
+    {"source": "my-agent", "command": ["my-agent", "resume", "--id={id}"], "color": "#f472b6"}
+  ]
+}
+```
+
+- `source`: the agent name agentsview reports
+- `command`: the command and its arguments; `{id}` is replaced with the session ID, also inside an argument such as `--id={id}`
+- `color`: `#RRGGBB`, optional
+
+An entry for a built-in agent replaces its command and keeps its color unless `color` is set. A missing file is ignored. If the file can't be read or any entry is invalid, asq ignores the whole file and prints one warning to stderr.
+
 ## Design
 
 [DESIGN](DESIGN/) describes how asq works, and [ADR](ADR/) records why (both in Japanese).

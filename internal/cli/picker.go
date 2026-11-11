@@ -6,6 +6,7 @@ import (
 
 	"github.com/saitota/asq/internal/ansitext"
 	"github.com/saitota/asq/internal/session"
+	"github.com/saitota/asq/internal/source"
 	"github.com/saitota/asq/internal/tui"
 )
 
@@ -26,21 +27,21 @@ func (a App) pickSession(sessions []session.Session, query string) (session.Sess
 	}
 	items := make([]tui.Item, len(sessions))
 	for i, sess := range sessions {
-		items[i] = tui.Item{Display: pickerLine(sess), Haystack: pickerHaystack(sess)}
+		items[i] = tui.Item{Display: pickerLine(a.sources, sess), Haystack: pickerHaystack(sess)}
 	}
 	pick := a.Pick
 	if pick == nil {
 		pick = tui.Pick
 	}
-	choice, err := pick(items, func(index int) string { return pickerPreviewText(sessions[index]) }, query)
+	choice, err := pick(items, func(index int) string { return pickerPreviewText(a.sources, sessions[index]) }, query)
 	if err != nil {
 		return session.Session{}, err
 	}
 	return sessions[choice], nil
 }
 
-func pickerLine(sess session.Session) string {
-	fields := []string{pickerSourceMarker(sess.Source), tableTime(sess)}
+func pickerLine(reg source.Registry, sess session.Session) string {
+	fields := []string{pickerSourceMarker(reg, sess.Source), tableTime(sess)}
 	if name := sanitizeDisplay(sess.Name); name != "" {
 		fields = append(fields, ansitext.TruncateEnd(name, pickerNameWidth))
 	}
@@ -78,11 +79,11 @@ func sanitizePreview(value string) string {
 
 // pickerSourceMarker identifies the source by color alone to save row width;
 // without colors it falls back to the source name.
-func pickerSourceMarker(source session.Source) string {
+func pickerSourceMarker(reg source.Registry, src session.Source) string {
 	if !colorEnabled() {
-		return string(source)
+		return string(src)
 	}
-	return colorSource(source, "●")
+	return colorSource(reg, src, "●")
 }
 
 // pickerHaystack is the lowercased text queries match against: every visible

@@ -36,8 +36,8 @@ func TestSmokeAgainstRealAgentsview(t *testing.T) {
 		if raw == "" || strings.Contains(raw, ":") {
 			t.Fatalf("rawID for %s (%s) = %q", item.ID, item.Agent, raw)
 		}
-		if _, ok := source.Get(session.Source(item.Agent)); ok {
-			if _, _, err := source.Resume(session.Source(item.Agent), raw); err != nil {
+		if _, ok := source.Builtin().Get(session.Source(item.Agent)); ok {
+			if _, _, err := source.Builtin().Resume(session.Source(item.Agent), raw); err != nil {
 				t.Fatalf("%s session id %q would fail resume: %v", item.Agent, raw, err)
 			}
 		}

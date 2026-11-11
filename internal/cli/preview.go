@@ -33,8 +33,8 @@ func previewMetaLine(value string) string {
 	return "\x1b[38;2;" + previewMetaBg + "m" + value + "\x1b[0m"
 }
 
-func sourceRGB(src session.Source) string {
-	return strings.TrimPrefix(source.ANSIColor(src), "38;2;")
+func sourceRGB(reg source.Registry, src session.Source) string {
+	return strings.TrimPrefix(reg.ANSIColor(src), "38;2;")
 }
 
 type previewStyle struct {
@@ -55,7 +55,7 @@ var coloredPreviewStyle = previewStyle{
 	body: sanitizePreview,
 }
 
-func renderPreview(sess session.Session, style previewStyle) string {
+func renderPreview(sess session.Session, srcRGB string, style previewStyle) string {
 	var out strings.Builder
 	_, _ = fmt.Fprintf(&out, "%s\n", style.meta(fmt.Sprintf("%s %s", sess.Source, sess.ID)))
 	if sess.Name != "" {
@@ -69,7 +69,6 @@ func renderPreview(sess session.Session, style previewStyle) string {
 		_, _ = fmt.Fprintf(&out, "%s\n", style.meta("warning: "+warning))
 	}
 	_, _ = fmt.Fprintf(&out, "%s\n\n", style.meta("updated: "+tableTime(sess)))
-	srcRGB := sourceRGB(sess.Source)
 	for i, msg := range sess.Messages {
 		if i >= previewMessageLimit {
 			_, _ = fmt.Fprintf(&out, "%s\n", style.meta(fmt.Sprintf("... %d more messages", len(sess.Messages)-i)))
@@ -91,13 +90,13 @@ func renderPreview(sess session.Session, style previewStyle) string {
 	return out.String()
 }
 
-func pickerPreviewText(sess session.Session) string {
+func pickerPreviewText(reg source.Registry, sess session.Session) string {
 	if !colorEnabled() {
 		return sanitizePreview(previewText(sess))
 	}
-	return renderPreview(sess, coloredPreviewStyle)
+	return renderPreview(sess, sourceRGB(reg, sess.Source), coloredPreviewStyle)
 }
 
 func previewText(sess session.Session) string {
-	return renderPreview(sess, plainPreviewStyle)
+	return renderPreview(sess, "", plainPreviewStyle)
 }

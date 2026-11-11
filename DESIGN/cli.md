@@ -23,12 +23,25 @@
 
 `pick` と `resume` は、次の同じ手順でエージェントの CLI を起動する。
 
-1. `source` の登録簿から argv を得る。登録の無いエージェントは resume できない。Claude Code・Codex・Cursor・Copilot 以外の登録は、agentsview の `internal/server/resume.go` の `resumeAgents` に合わせる
-2. ID が登録簿の規則（既定は `^[A-Za-z0-9._-]+$`）に合うか確かめる
+1. `source` の登録簿から argv を得る。登録の無いエージェントは resume できない。登録簿は組み込みの表にユーザー定義ファイルを重ねたもので、組み込みのうち Claude Code・Codex・Cursor・Copilot 以外は、agentsview a078a250 の `internal/server/resume.go` の `resumeAgents` に合わせてある
+2. ID が登録簿の規則（既定は `^[A-Za-z0-9._-]+$`。ユーザー定義も同じ）に合うか確かめる
 3. cwd が分かっていて、実在するディレクトリか確かめる
 4. コマンドを PATH から探し、cwd と argv を stderr に出し、cwd で子プロセスとして実行する
 
 `resume --dry-run` は手順4の代わりに cwd と argv を stdout に出す。
+
+## ユーザー定義のエージェント
+
+組み込みの表は agentsview の内部の表の写しで、上流が変わるとずれる。resume できるエージェントと色は、ユーザー定義ファイルで足せる・上書きできる。
+
+- 場所: `$ASQ_AGENTS_FILE`。未設定なら `os.UserConfigDir()` の下の `asq/agents.json`。設定ディレクトリが分からない時は読まない
+- 形: `{"agents":[{"source":"my-agent","command":["my-agent","resume","--id={id}"],"color":"#f472b6"}]}`
+  - `source`: agentsview のエージェント名。必須。同じ値を2つ書くと不正
+  - `command`: argv。必須。要素の中の `{id}` をセッション ID に置き換える。空、先頭の要素が空、`{id}` を含む要素が無いものは不正
+  - `color`: `#RRGGBB`。省略できる。内部では `38;2;R;G;B` の SGR パラメータに変えて持つ。形式が違えば不正
+- 組み込みと同じ `source` は、コマンドを置き換える。`color` を省くと組み込みの色が残る。組み込みに無い `source` で省くと、登録の無いエージェントと同じ色になる
+- ファイルが無ければ何もしない。読めない、JSON が不正、エントリが1つでも不正なら、ユーザー定義を全部使わず組み込みだけで動き、stderr に `asq: ` で始まる警告を1行出す
+- サブコマンドを選ぶ前に一度だけ読み、`version` と `help` では読まない。読み込みと組み込みの表との合成は `source`、警告の出力は `cli`
 
 ## ピッカー
 
@@ -39,4 +52,4 @@
 ## 色
 
 - `NO_COLOR` があれば色を付けない。表は出力先が端末の時だけ色を付ける
-- エージェントの色は `source` の登録簿、無ければ agentsview の配色、それも無ければ灰色
+- エージェントの色は `source` の登録簿（ユーザー定義の `color` を含む）、無ければ agentsview の配色、それも無ければ灰色

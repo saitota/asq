@@ -19,7 +19,7 @@ agentsview の [Session API](https://github.com/kenn-io/agentsview/blob/main/doc
 1. `id` に `<agent>:` が付くことがあり、エージェントの CLI はその形を受け付けない
 2. `--role` で絞ると ordinal が飛ぶため、`--limit` に満たないページの後にも続きがある
 3. アイドル終了したデーモンを起動した直後の `session list` は、ストア全体の再同期を待つため数十秒かかる
-4. 登録簿に無いエージェントの色は、agentsview フロントエンドの定義を `source.go` に転記したもの
+4. resume のコマンドと、Claude・Codex・Cursor・Copilot 以外の色は、agentsview の内部の定義（`internal/server/resume.go` の `resumeAgents`、フロントエンドの `agents.ts`）を `source.go` に転記したもの。a078a250 に合わせてあり、上流が変わるとずれる。ずれはユーザー定義ファイルで直す（[cli.md](cli.md)）
 
 ## キャッシュ
 

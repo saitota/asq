@@ -29,7 +29,7 @@ func TestSelectionLineEncodeDecodeRoundTrip(t *testing.T) {
 			Content: "hello",
 		}},
 	}
-	encoded := newSelectionLine(sess, true).encode()
+	encoded := newSelectionLine(source.Builtin(), sess, true).encode()
 	if got := selectionKeyFromSelection(encoded); got != sess.ID {
 		t.Fatalf("selectionKeyFromSelection(encode()) = %q, want %q", got, sess.ID)
 	}

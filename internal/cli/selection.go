@@ -10,6 +10,7 @@ import (
 
 	"github.com/saitota/asq/internal/ansitext"
 	"github.com/saitota/asq/internal/session"
+	"github.com/saitota/asq/internal/source"
 )
 
 // The session ID is deliberately the last field so that when a whole line is
@@ -45,13 +46,13 @@ type selectionLine struct {
 	SearchText string
 }
 
-func newSelectionLine(sess session.Session, color bool) selectionLine {
-	source := string(sess.Source)
+func newSelectionLine(reg source.Registry, sess session.Session, color bool) selectionLine {
+	label := string(sess.Source)
 	if color && colorEnabled() {
-		source = colorSource(sess.Source, source)
+		label = colorSource(reg, sess.Source, label)
 	}
 	return selectionLine{
-		Source:     source,
+		Source:     label,
 		Time:       sessionTime(sess),
 		Name:       sess.Name,
 		CWD:        sess.CWD,

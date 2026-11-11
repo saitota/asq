@@ -37,7 +37,7 @@ func (a App) resume(args []string) error {
 	if err != nil {
 		return err
 	}
-	cmd, cmdArgs, err := resumeTarget(sess)
+	cmd, cmdArgs, err := resumeTarget(a.sources, sess)
 	if err != nil {
 		return err
 	}
@@ -66,15 +66,15 @@ func (a App) pick(args []string) error {
 	if err != nil {
 		return err
 	}
-	cmd, cmdArgs, err := resumeTarget(sess)
+	cmd, cmdArgs, err := resumeTarget(a.sources, sess)
 	if err != nil {
 		return err
 	}
 	return a.execResumeCommand(sess.Source, sess.CWD, cmd, cmdArgs)
 }
 
-func resumeTarget(sess session.Session) (cmd string, args []string, err error) {
-	cmd, args, err = source.Resume(sess.Source, sess.ID)
+func resumeTarget(reg source.Registry, sess session.Session) (cmd string, args []string, err error) {
+	cmd, args, err = reg.Resume(sess.Source, sess.ID)
 	if err != nil {
 		return "", nil, err
 	}
