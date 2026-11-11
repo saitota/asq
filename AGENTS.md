@@ -8,7 +8,6 @@ asq は、agentsview が集めたコーディングエージェントのセッ�
 task check                                    # ビルド、テスト、vet
 go test ./internal/cli -run TestName          # 単体のテスト
 ASQ_AGENTSVIEW_SMOKE=1 go test ./internal/agentsview   # 実物の agentsview との契約確認
-task install-local                            # 現在のブランチを ~/.local/bin に配置
 task demo                                     # demo/demo.gif を録り直す
 ```
 

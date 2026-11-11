@@ -22,12 +22,6 @@ Or install with Go (1.25+):
 go install github.com/saitota/asq/cmd/asq@latest
 ```
 
-Or build from a clone:
-
-```sh
-go build -o asq ./cmd/asq
-```
-
 Requirements:
 
 - Unix/macOS

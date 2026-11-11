@@ -53,18 +53,6 @@ tasks:
       - task: test
       - task: vet
 
-  install-local:
-    desc: 現在のブランチをビルドして ~/.local/bin に配置
-    vars:
-      VERSION:
-        sh: echo "local-$(git branch --show-current)-$(git rev-parse --short HEAD)"
-    deps: [test]
-    cmds:
-      - mkdir -p {{.INSTALL_DIR}} {{.DIST}}
-      - go build -ldflags "-X {{.MODULE}}/internal/buildinfo.Version={{.VERSION}} -X {{.MODULE}}/internal/buildinfo.BuildDate={{.BUILD_DATE}}" -o {{.DIST}}/{{.BINARY}} ./cmd/asq
-      - install -m 0755 {{.DIST}}/{{.BINARY}} {{.INSTALL_DIR}}/{{.BINARY}}
-      - '{{.INSTALL_DIR}}/{{.BINARY}} version'
-
   package:
     desc: バイナリをビルドしてzip化
     cmds:
