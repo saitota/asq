@@ -1,6 +1,7 @@
 package source
 
 import (
+	"bytes"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -63,6 +64,13 @@ func parseAgents(data []byte) ([]Descriptor, error) {
 	if err := json.Unmarshal(data, &file); err != nil {
 		return nil, err
 	}
+	// Unmarshal cannot reject unknown keys, and a Decoder words malformed input
+	// differently, so a strict pass follows the one that reports syntax errors.
+	strict := json.NewDecoder(bytes.NewReader(data))
+	strict.DisallowUnknownFields()
+	if err := strict.Decode(&agentsFile{}); err != nil {
+		return nil, err
+	}
 	descriptors := make([]Descriptor, 0, len(file.Agents))
 	for i, entry := range file.Agents {
 		d, err := entry.descriptor()
@@ -70,7 +78,7 @@ func parseAgents(data []byte) ([]Descriptor, error) {
 			return nil, fmt.Errorf("agents[%d]: %w", i, err)
 		}
 		if _, dup := find(descriptors, d.Source); dup {
-			return nil, fmt.Errorf("agents[%d]: duplicate source %s", i, d.Source)
+			return nil, fmt.Errorf("agents[%d]: duplicate source %q", i, d.Source)
 		}
 		descriptors = append(descriptors, d)
 	}

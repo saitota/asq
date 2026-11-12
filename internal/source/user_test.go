@@ -151,6 +151,8 @@ func TestLoadRejectsUnusableFiles(t *testing.T) {
 		{"empty file", ``, "unexpected end of JSON input"},
 		{"trailing data", `{} {}`, "after top-level value"},
 		{"wrong shape", `{"agents":{}}`, "cannot unmarshal object"},
+		{"unknown top-level key", `{"agent":[{"source":"acme","command":["acme","{id}"]}]}`, `unknown field "agent"`},
+		{"unknown key in an entry", `{"agents":[{"source":"acme","command":["acme","{id}"],"colour":"#ff0000"}]}`, `unknown field "colour"`},
 		{"missing source", `{"agents":[{"command":["acme","{id}"]}]}`, "agents[0]: source is required"},
 		{"missing command", `{"agents":[{"source":"acme"}]}`, "agents[0]: command is required"},
 		{"empty command", `{"agents":[{"source":"acme","command":[]}]}`, "agents[0]: command is required"},
@@ -162,7 +164,8 @@ func TestLoadRejectsUnusableFiles(t *testing.T) {
 		{"color with alpha", `{"agents":[{"source":"acme","command":["acme","{id}"],"color":"#f472b6ff"}]}`, `must be #RRGGBB`},
 		{"non-hex color", `{"agents":[{"source":"acme","command":["acme","{id}"],"color":"#gggggg"}]}`, `must be #RRGGBB`},
 		{"empty color", `{"agents":[{"source":"acme","command":["acme","{id}"],"color":""}]}`, `color "" must be #RRGGBB`},
-		{"duplicate source", `{"agents":[{"source":"acme","command":["acme","{id}"]},{"source":"acme","command":["acme2","{id}"]}]}`, "agents[1]: duplicate source acme"},
+		{"duplicate source", `{"agents":[{"source":"acme","command":["acme","{id}"]},{"source":"acme","command":["acme2","{id}"]}]}`, `agents[1]: duplicate source "acme"`},
+		{"duplicate source with a newline", `{"agents":[{"source":"a\nb","command":["a","{id}"]},{"source":"a\nb","command":["b","{id}"]}]}`, `agents[1]: duplicate source "a\nb"`},
 		{"one bad entry among good ones", `{"agents":[{"source":"acme","command":["acme","{id}"]},{"source":"beta","command":["beta"]}]}`, "agents[1]: command must contain {id}"},
 	}
 	for _, c := range cases {

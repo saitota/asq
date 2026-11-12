@@ -128,6 +128,13 @@ func TestPickRunsUserDefinedCommandInSessionCWD(t *testing.T) {
 	if len(lines) != 3 || lines[1] != "session" || lines[2] != "--id=sid" {
 		t.Fatalf("acme recorded %q", string(data))
 	}
+	wantDir, err := filepath.EvalSymlinks(projectDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if lines[0] != wantDir && lines[0] != projectDir {
+		t.Fatalf("acme ran in %q, want %q", lines[0], projectDir)
+	}
 }
 
 func TestUserDefinedAgentOverridesBuiltinCommandAndKeepsItsColor(t *testing.T) {
@@ -151,6 +158,30 @@ func TestUserDefinedAgentOverridesBuiltinCommandAndKeepsItsColor(t *testing.T) {
 	claudeColor := "\x1b[" + source.Builtin().ANSIColor(source.Claude) + "m"
 	if field := strings.Split(stdout, "\t")[fzfSourceField]; !strings.Contains(field, claudeColor) {
 		t.Fatalf("source field = %q, want %q", field, claudeColor)
+	}
+}
+
+func TestColorSourceInLabelUsesTheLoadedRegistry(t *testing.T) {
+	t.Setenv("NO_COLOR", "")
+	useAgentsFile(t, `{"agents":[
+		{"source":"acme","command":["acme","{id}"],"color":"#112233"},
+		{"source":"claude","command":["my-claude","{id}"],"color":"#445566"}
+	]}`)
+	reg, err := source.Load()
+	if err != nil {
+		t.Fatalf("Load err = %v", err)
+	}
+	label := "  acme acme-0001 main"
+	want := "  \x1b[38;2;17;34;51macme\x1b[0m acme-0001 main"
+	if got := colorSourceInLabel(reg, label, "acme"); got != want {
+		t.Fatalf("user-defined agent: got %q, want %q", got, want)
+	}
+	wantClaude := "  \x1b[38;2;68;85;102mclaude\x1b[0m sid"
+	if got := colorSourceInLabel(reg, "  claude sid", source.Claude); got != wantClaude {
+		t.Fatalf("overridden color: got %q, want %q", got, wantClaude)
+	}
+	if got := colorSourceInLabel(source.Builtin(), label, "acme"); got == want {
+		t.Fatalf("built-in registry colored the user-defined agent: %q", got)
 	}
 }
 

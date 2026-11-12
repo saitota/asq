@@ -81,7 +81,7 @@ asq resumes the agents it has a built-in command for. To add an agent or change 
 - `command`: the command and its arguments; `{id}` is replaced with the session ID, also inside an argument such as `--id={id}`
 - `color`: `#RRGGBB`, optional
 
-An entry for a built-in agent replaces its command and keeps its color unless `color` is set. A missing file is ignored. If the file can't be read or any entry is invalid, asq ignores the whole file and prints one warning to stderr.
+An entry for a built-in agent replaces its command and keeps its color unless `color` is set. A missing file is ignored. If the file can't be read or parsed, contains an unknown key, or has any invalid entry, asq ignores the whole file and prints one warning to stderr.
 
 ## Design
 

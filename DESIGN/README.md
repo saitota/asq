@@ -29,4 +29,4 @@ stdout はコマンド出力に使う。進捗と警告は stderr、ピッカー
 ## 文書
 
 - [agentsview.md](agentsview.md): 取得、前提、キャッシュ、劣化動作、進捗
-- [cli.md](cli.md): 振り分け、セッション指定、list、選択プロトコル、resume、ピッカー、色
+- [cli.md](cli.md): 振り分け、セッション指定、list、選択プロトコル、resume、ユーザー定義のエージェント、ピッカー、色
