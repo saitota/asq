@@ -13,17 +13,18 @@ import (
 )
 
 const (
-	Claude     session.Source = "claude"
-	Codex      session.Source = "codex"
-	Cursor     session.Source = "cursor"
-	Copilot    session.Source = "copilot"
-	Gemini     session.Source = "gemini"
-	OpenCode   session.Source = "opencode"
-	Amp        session.Source = "amp"
-	Kiro       session.Source = "kiro"
-	Pi         session.Source = "pi"
-	TraeX      session.Source = "traex"
-	AugureCode session.Source = "augure-code"
+	Claude          session.Source = "claude"
+	Codex           session.Source = "codex"
+	Cursor          session.Source = "cursor"
+	Copilot         session.Source = "copilot"
+	Gemini          session.Source = "gemini"
+	OpenCode        session.Source = "opencode"
+	Amp             session.Source = "amp"
+	Kiro            session.Source = "kiro"
+	Pi              session.Source = "pi"
+	TraeX           session.Source = "traex"
+	AugureCode      session.Source = "augure-code"
+	OpenInterpreter session.Source = "open-interpreter"
 )
 
 type Descriptor struct {
@@ -117,7 +118,14 @@ var All = []Descriptor{
 		ResumeCommand: func(id string) (string, []string) {
 			return "augure", []string{"resume", id}
 		},
-		ANSIColor: DefaultANSIColor,
+		ANSIColor: extraColors[AugureCode],
+	},
+	{
+		Source: OpenInterpreter,
+		ResumeCommand: func(id string) (string, []string) {
+			return "interpreter", []string{"resume", id}
+		},
+		ANSIColor: extraColors[OpenInterpreter],
 	},
 }
 
@@ -129,29 +137,38 @@ const DefaultANSIColor = "38;2;209;213;219"
 // agentsview color fall back to DefaultANSIColor gray. Claude, Codex, Cursor
 // and Copilot keep asq's established colors instead.
 var extraColors = map[session.Source]string{
-	"visualstudio-copilot": "38;2;96;165;250",  // blue
-	"zed":                  "38;2;74;222;128",  // green
-	"codebuff":             "38;2;251;191;36",  // amber
+	"visualstudio-copilot": "38;2;96;165;250", // blue
+	"codebuddy":            "38;2;96;165;250",
+	"zed":                  "38;2;74;222;128", // green
+	"codebuff":             "38;2;251;191;36", // amber
+	"tau":                  "38;2;251;191;36",
 	"devin":                "38;2;248;113;113", // red
 	"zencoder":             "38;2;248;113;113",
+	"codex-cloud":          "38;2;248;113;113",
 	"opencode":             "38;2;167;139;250", // purple
 	"kilo":                 "38;2;167;139;250",
 	"kilo-legacy":          "38;2;167;139;250",
 	"cowork":               "38;2;56;189;248", // sky
 	"iflow":                "38;2;56;189;248",
 	"freebuff":             "38;2;56;189;248",
+	"fx":                   "38;2;56;189;248",
+	"muse":                 "38;2;56;189;248",
 	"traex":                "38;2;243;78;63", // coral
 	"amp":                  "38;2;243;78;63",
+	"crush":                "38;2;243;78;63",
 	"gemini":               "38;2;251;113;133", // rose
 	"gemini-apps":          "38;2;251;113;133",
 	"roocode":              "38;2;251;113;133",
 	"openhands":            "38;2;45;212;191", // teal
 	"vscode-copilot":       "38;2;45;212;191",
 	"omnigent":             "38;2;45;212;191",
+	"evener":               "38;2;45;212;191",
 	"cursor-ide":           "38;2;176;176;176", // black
 	"pi":                   "38;2;129;140;248", // indigo
 	"prime-agent":          "38;2;129;140;248",
 	"posit-assistant":      "38;2;129;140;248",
+	"opencodereview":       "38;2;129;140;248",
+	"stepcode":             "38;2;129;140;248",
 	"qwen":                 "38;2;34;211;238", // cyan
 	"qwenpaw":              "38;2;34;211;238",
 	"deepseek-tui":         "38;2;34;211;238",
@@ -165,13 +182,18 @@ var extraColors = map[session.Source]string{
 	"vibe":                 "38;2;240;160;80",
 	"kimi":                 "38;2;244;114;182", // pink
 	"kimi-work":            "38;2;244;114;182",
+	"open-interpreter":     "38;2;244;114;182",
 	"claude-ai":            "38;2;167;139;250", // violet
 	"workbuddy":            "38;2;167;139;250",
 	"antigravity":          "38;2;167;139;250",
 	"antigravity-cli":      "38;2;167;139;250",
+	"augure-desktop":       "38;2;167;139;250",
+	"cline":                "38;2;167;139;250",
 	"chatgpt":              "38;2;163;230;53", // lime
 	"kiro":                 "38;2;163;230;53",
 	"kiro-ide":             "38;2;163;230;53",
+	"augure-code":          "38;2;163;230;53",
+	"junie":                "38;2;163;230;53",
 }
 
 func Get(s session.Source) (Descriptor, bool) {
