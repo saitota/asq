@@ -1,6 +1,7 @@
 package source
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/saitota/asq/internal/session"
@@ -88,5 +89,33 @@ func TestResumeUsesDescriptorValidID(t *testing.T) {
 	_, _, err := Resume("custom", "abc")
 	if err == nil || err.Error() != "invalid cached session id: abc" {
 		t.Fatalf("got %v", err)
+	}
+}
+
+func TestTableFollowsAgentsview(t *testing.T) {
+	cmd, args, err := Resume(OpenInterpreter, "sid")
+	if err != nil || cmd != "interpreter" || !slices.Equal(args, []string{"resume", "sid"}) {
+		t.Fatalf("open-interpreter: got %q %v %v", cmd, args, err)
+	}
+	colors := map[session.Source]string{
+		"augure-code":      "38;2;163;230;53",
+		"augure-desktop":   "38;2;167;139;250",
+		"cline":            "38;2;167;139;250",
+		"codebuddy":        "38;2;96;165;250",
+		"codex-cloud":      "38;2;248;113;113",
+		"crush":            "38;2;243;78;63",
+		"evener":           "38;2;45;212;191",
+		"fx":               "38;2;56;189;248",
+		"junie":            "38;2;163;230;53",
+		"muse":             "38;2;56;189;248",
+		"open-interpreter": "38;2;244;114;182",
+		"opencodereview":   "38;2;129;140;248",
+		"stepcode":         "38;2;129;140;248",
+		"tau":              "38;2;251;191;36",
+	}
+	for agent, want := range colors {
+		if got := ANSIColor(agent); got != want {
+			t.Fatalf("%s: color = %q, want %q", agent, got, want)
+		}
 	}
 }
