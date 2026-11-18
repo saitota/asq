@@ -58,7 +58,7 @@ func newSelectionLine(sess session.Session, color bool) selectionLine {
 		GitBranch:  sess.GitBranch,
 		Snippet:    sess.Snippet(fzfSnippetLimit),
 		ID:         sess.ID,
-		SearchText: ansitext.Strip(sess.SearchText(fzfSearchTextLimit)),
+		SearchText: strings.TrimSpace(ansitext.Strip(sess.PRSearchText() + " " + sess.SearchText(fzfSearchTextLimit))),
 	}
 }
 

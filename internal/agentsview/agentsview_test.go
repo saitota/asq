@@ -3,6 +3,7 @@ package agentsview
 import (
 	"fmt"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"sync"
 	"testing"
@@ -403,5 +404,56 @@ func TestSessionsReportsProgressEvents(t *testing.T) {
 	}
 	if highestDone != total {
 		t.Fatalf("highest done = %d, want %d", highestDone, total)
+	}
+}
+
+func prLinksOverride() map[string]any {
+	return map[string]any{"pr_links": []any{
+		map[string]any{"url": "https://github.com/owner-example/repo-example/pull/123", "host": "github.com", "repository": "owner-example/repo-example", "number": 123},
+	}}
+}
+
+func TestSessionsReadsPRLinksAndServesThemFromCache(t *testing.T) {
+	stub := agentsviewtest.Install(t)
+	cache := filepath.Join(t.TempDir(), "agentsview-messages.json")
+	stub.SetList(t, codexEntry(prLinksOverride()))
+	stub.SetMessages(t, "codex:0000-1111", codexMessage())
+	want := []session.PRLink{{URL: "https://github.com/owner-example/repo-example/pull/123", Host: "github.com", Repository: "owner-example/repo-example", Number: 123}}
+	got, err := Client{Bin: stub.Bin, CachePath: cache}.Sessions()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 1 || !reflect.DeepEqual(got[0].PRLinks, want) {
+		t.Fatalf("pr links = %+v", got)
+	}
+	stub.Break(t)
+	got, err = Client{Bin: stub.Bin, CachePath: cache}.Sessions()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 1 || !reflect.DeepEqual(got[0].PRLinks, want) {
+		t.Fatalf("cached pr links = %+v", got)
+	}
+}
+
+func TestSessionsRewritesCacheWhenOnlyPRLinksChange(t *testing.T) {
+	stub := agentsviewtest.Install(t)
+	cache := filepath.Join(t.TempDir(), "agentsview-messages.json")
+	stub.SetList(t, codexEntry())
+	stub.SetMessages(t, "codex:0000-1111", codexMessage())
+	if _, err := (Client{Bin: stub.Bin, CachePath: cache}).Sessions(); err != nil {
+		t.Fatal(err)
+	}
+	stub.SetList(t, codexEntry(prLinksOverride()))
+	if _, err := (Client{Bin: stub.Bin, CachePath: cache}).Sessions(); err != nil {
+		t.Fatal(err)
+	}
+	stub.Break(t)
+	got, err := Client{Bin: stub.Bin, CachePath: cache}.Sessions()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 1 || len(got[0].PRLinks) != 1 {
+		t.Fatalf("cached pr links = %+v", got)
 	}
 }

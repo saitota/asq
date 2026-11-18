@@ -94,6 +94,7 @@ func pickerHaystack(sess session.Session) string {
 		sess.CWD,
 		sess.GitBranch,
 		sess.ID,
+		sess.PRSearchText(),
 		ansitext.Strip(sess.SearchText(0)),
 	}
 	return strings.ToLower(strings.Join(parts, " "))

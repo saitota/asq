@@ -17,8 +17,16 @@ type listSession struct {
 	CWD       string        `json:"cwd"`
 	GitBranch string        `json:"git_branch,omitempty"`
 	Timestamp time.Time     `json:"timestamp"`
+	PRLinks   []listPRLink  `json:"pr_links,omitempty"`
 	Messages  []listMessage `json:"messages"`
 	Errors    []string      `json:"errors,omitempty"`
+}
+
+type listPRLink struct {
+	URL        string `json:"url"`
+	Host       string `json:"host,omitempty"`
+	Repository string `json:"repository,omitempty"`
+	Number     int    `json:"number"`
 }
 
 type listMessage struct {
@@ -43,9 +51,21 @@ func newListSession(sess session.Session) listSession {
 		CWD:       sess.CWD,
 		GitBranch: sess.GitBranch,
 		Timestamp: sess.Timestamp,
+		PRLinks:   newListPRLinks(sess.PRLinks),
 		Messages:  newListMessages(sess.Messages),
 		Errors:    sess.Errors,
 	}
+}
+
+func newListPRLinks(links []session.PRLink) []listPRLink {
+	if len(links) == 0 {
+		return nil
+	}
+	out := make([]listPRLink, len(links))
+	for i, link := range links {
+		out[i] = listPRLink{URL: link.URL, Host: link.Host, Repository: link.Repository, Number: link.Number}
+	}
+	return out
 }
 
 func newListMessages(messages []session.Message) []listMessage {

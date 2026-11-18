@@ -11,6 +11,7 @@ agentsview の [Session API](https://github.com/kenn-io/agentsview/blob/main/doc
 - `--from <last_ordinal + 1>` でページングし、空ページで終える。`last_ordinal` が進まない時かページ上限に達した時は不完全とする
 - resume 用の ID は `source_session_id`、無ければ `id` から `<agent>:` を外したもの
 - 時刻は `ended_at`、無ければ `started_at`
+- 連携した PR は一覧の `pr_links`（`url`・`host`・`repository`・`number`）を読む
 
 ## ドキュメントに無い前提
 
@@ -20,15 +21,16 @@ agentsview の [Session API](https://github.com/kenn-io/agentsview/blob/main/doc
 2. `--role` で絞ると ordinal が飛ぶため、`--limit` に満たないページの後にも続きがある
 3. アイドル終了したデーモンを起動した直後の `session list` は、ストア全体の再同期を待つため数十秒かかる
 4. 登録簿に無いエージェントの色は、agentsview フロントエンドの定義を `source.go` に転記したもの
+5. 一覧の各セッションが `pr_links` を持つことがあり、1件は `{"url", "host", "repository", "number"}`（agentsview v0.47.0 で観測）。`ASQ_AGENTSVIEW_SMOKE=1` のテストが、実物から読めて必須の値が揃うことを確かめる
 
 ## キャッシュ
 
 - 場所: macOS は `~/Library/Caches/asq/agentsview-messages.json`、それ以外は `${XDG_CACHE_HOME:-~/.cache}/asq/agentsview-messages.json`
-- 中身: agentsview の ID ごとにシグネチャとセッション（メタデータと会話本文）。JSON タグを変えたら `cacheVersion` を上げる
+- 中身: agentsview の ID ごとにシグネチャとセッション（メタデータ、連携した PR、会話本文）。JSON タグを変えたら `cacheVersion` を上げる
 - シグネチャ: `ended_at|message_count|transcript_revision`
-- 一覧が取れた時は、名前・cwd・ブランチ・時刻をそこから取り、キャッシュからは本文だけを使う
+- 一覧が取れた時は、名前・cwd・ブランチ・時刻・連携した PR をそこから取り、キャッシュからは本文だけを使う
 - 一覧から消えたセッションはキャッシュからも消える
-- 内容が変わった時だけ、一時ファイルに書いてから rename する。書き込みの失敗は無視する
+- 内容か連携した PR が変わった時だけ、一時ファイルに書いてから rename する。書き込みの失敗は無視する
 - ファイルが読めない時、JSON が不正な時、版が違う時は空のキャッシュとして扱う
 
 ## 劣化動作

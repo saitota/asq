@@ -758,3 +758,42 @@ func TestResumeReportsInvalidIDBeforeCWD(t *testing.T) {
 		t.Fatalf("err = %v", err)
 	}
 }
+
+func TestPickerHaystackMatchesLinkedPRs(t *testing.T) {
+	sess := session.Session{
+		Source: source.Claude, CWD: "/tmp",
+		PRLinks:  []session.PRLink{{URL: "https://github.com/owner-example/repo-example/pull/123", Host: "github.com", Repository: "owner-example/repo-example", Number: 123}},
+		Messages: []session.Message{{Role: session.RoleUser, Content: "no number here"}},
+	}
+	haystack := pickerHaystack(sess)
+	for _, query := range []string{"#123", "pull/123", "repo-example#123", "owner-example/repo-example#123"} {
+		if !strings.Contains(haystack, query) {
+			t.Fatalf("haystack misses %q: %s", query, haystack)
+		}
+	}
+	plain := pickerHaystack(session.Session{Source: source.Claude, CWD: "/tmp"})
+	if strings.Contains(plain, "#") || strings.Contains(plain, "pull/") {
+		t.Fatalf("session without links changed: %s", plain)
+	}
+	if !strings.Contains(newSelectionLine(sess, false).SearchText, "repo-example#123") {
+		t.Fatal("fzf search text misses linked PR")
+	}
+}
+
+func TestListJSONIncludesPRLinks(t *testing.T) {
+	projectDir := makeDir(t, t.TempDir(), "proj")
+	installAgentsviewStub(t,
+		[]map[string]any{agentsviewtest.Session("sid", "claude", "n", projectDir, "hello", map[string]any{"pr_links": []any{
+			map[string]any{"url": "https://github.com/owner-example/repo-example/pull/123", "host": "github.com", "repository": "owner-example/repo-example", "number": 123},
+		}})},
+		map[string][]map[string]any{"sid": stubMessages("hello")})
+	var stdout, stderr bytes.Buffer
+	app := App{Stdout: &stdout, Stderr: &stderr, Stdin: strings.NewReader("")}
+	if err := app.Run([]string{"list", "--cache", tempCache(t), "--json", "--all"}); err != nil {
+		t.Fatalf("list err = %v stderr=%s", err, stderr.String())
+	}
+	want := `"pr_links":[{"url":"https://github.com/owner-example/repo-example/pull/123","host":"github.com","repository":"owner-example/repo-example","number":123}]`
+	if !strings.Contains(stdout.String(), want) {
+		t.Fatalf("output = %s", stdout.String())
+	}
+}
