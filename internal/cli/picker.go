@@ -17,7 +17,6 @@ const pickerPathWidth = 28
 const pickerBranchWidth = 20
 
 const pickerSnippetLimit = 160
-const pickerSearchTextLimit = 32 * 1024
 
 func (a App) pickSession(sessions []session.Session, query string) (session.Session, error) {
 	sessions = session.Filter(sessions, session.FilterOptions{})
@@ -95,7 +94,7 @@ func pickerHaystack(sess session.Session) string {
 		sess.CWD,
 		sess.GitBranch,
 		sess.ID,
-		ansitext.Strip(sess.SearchText(pickerSearchTextLimit)),
+		ansitext.Strip(sess.SearchText(0)),
 	}
 	return strings.ToLower(strings.Join(parts, " "))
 }
