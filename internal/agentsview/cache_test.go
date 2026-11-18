@@ -11,7 +11,7 @@ import (
 	"github.com/saitota/asq/internal/session"
 )
 
-const goldenCacheJSON = `{"version":2,"entries":{"codex:0000-1111":{"signature":"sig-1","session":{"id":"0000-1111","source":"codex","name":"tfupdate-series","cwd":"/tmp/proj","git_branch":"main","timestamp":"2026-09-01T03:06:13Z","messages":[{"role":"user","content":"PRつくって","timestamp":"2026-08-31T09:42:43Z"},{"role":"assistant","content":"作りました","timestamp":"2026-08-31T09:43:00Z"}]}}}}`
+const goldenCacheJSON = `{"version":3,"entries":{"codex:0000-1111":{"signature":"sig-1","session":{"id":"0000-1111","source":"codex","name":"tfupdate-series","cwd":"/tmp/proj","git_branch":"main","timestamp":"2026-09-01T03:06:13Z","pr_links":[{"url":"https://github.com/owner-example/repo-example/pull/123","host":"github.com","repository":"owner-example/repo-example","number":123}],"messages":[{"role":"user","content":"PRつくって","timestamp":"2026-08-31T09:42:43Z"},{"role":"assistant","content":"作りました","timestamp":"2026-08-31T09:43:00Z"}]}}}}`
 
 func goldenCacheFile() cacheFile {
 	return cacheFile{
@@ -26,6 +26,7 @@ func goldenCacheFile() cacheFile {
 					CWD:       "/tmp/proj",
 					GitBranch: "main",
 					Timestamp: time.Date(2026, 9, 1, 3, 6, 13, 0, time.UTC),
+					PRLinks:   []cachedPRLink{{URL: "https://github.com/owner-example/repo-example/pull/123", Host: "github.com", Repository: "owner-example/repo-example", Number: 123}},
 					Messages: []cachedMessage{
 						{Role: "user", Content: "PRつくって", Timestamp: time.Date(2026, 8, 31, 9, 42, 43, 0, time.UTC)},
 						{Role: "assistant", Content: "作りました", Timestamp: time.Date(2026, 8, 31, 9, 43, 0, 0, time.UTC)},
@@ -62,6 +63,7 @@ func TestCachedSessionRoundTrip(t *testing.T) {
 			CWD:       "/tmp/proj",
 			GitBranch: "main",
 			Timestamp: time.Date(2026, 9, 1, 3, 6, 13, 0, time.UTC),
+			PRLinks:   []session.PRLink{{URL: "https://github.com/owner-example/repo-example/pull/123", Host: "github.com", Repository: "owner-example/repo-example", Number: 123}},
 			Messages: []session.Message{
 				{Role: session.RoleUser, Content: "PRつくって", Timestamp: time.Date(2026, 8, 31, 9, 42, 43, 0, time.UTC)},
 				{Role: session.RoleAssistant, Content: "作りました", Timestamp: time.Date(2026, 8, 31, 9, 43, 0, 0, time.UTC)},

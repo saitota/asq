@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
 	"time"
 
 	"github.com/saitota/asq/internal/session"
@@ -15,7 +16,7 @@ import (
 // can at worst lose each other's updates, never corrupt the file.
 
 // Bump when the cachedSession or cachedMessage JSON tags change.
-const cacheVersion = 2
+const cacheVersion = 3
 const cacheDirMode = 0o700
 const cacheFileMode = 0o600
 
@@ -36,7 +37,15 @@ type cachedSession struct {
 	CWD       string          `json:"cwd"`
 	GitBranch string          `json:"git_branch,omitempty"`
 	Timestamp time.Time       `json:"timestamp"`
+	PRLinks   []cachedPRLink  `json:"pr_links,omitempty"`
 	Messages  []cachedMessage `json:"messages"`
+}
+
+type cachedPRLink struct {
+	URL        string `json:"url"`
+	Host       string `json:"host,omitempty"`
+	Repository string `json:"repository,omitempty"`
+	Number     int    `json:"number"`
 }
 
 type cachedMessage struct {
@@ -53,8 +62,31 @@ func newCachedSession(sess session.Session) cachedSession {
 		CWD:       sess.CWD,
 		GitBranch: sess.GitBranch,
 		Timestamp: sess.Timestamp,
+		PRLinks:   newCachedPRLinks(sess.PRLinks),
 		Messages:  newCachedMessages(sess.Messages),
 	}
+}
+
+func newCachedPRLinks(links []session.PRLink) []cachedPRLink {
+	if len(links) == 0 {
+		return nil
+	}
+	out := make([]cachedPRLink, len(links))
+	for i, link := range links {
+		out[i] = cachedPRLink{URL: link.URL, Host: link.Host, Repository: link.Repository, Number: link.Number}
+	}
+	return out
+}
+
+func (c cachedSession) toPRLinks() []session.PRLink {
+	if len(c.PRLinks) == 0 {
+		return nil
+	}
+	out := make([]session.PRLink, len(c.PRLinks))
+	for i, link := range c.PRLinks {
+		out[i] = session.PRLink{URL: link.URL, Host: link.Host, Repository: link.Repository, Number: link.Number}
+	}
+	return out
 }
 
 func newCachedMessages(messages []session.Message) []cachedMessage {
@@ -76,6 +108,7 @@ func (c cachedSession) toSession() session.Session {
 		CWD:       c.CWD,
 		GitBranch: c.GitBranch,
 		Timestamp: c.Timestamp,
+		PRLinks:   c.toPRLinks(),
 		Messages:  c.toMessages(),
 	}
 }
@@ -107,13 +140,14 @@ func loadCache(path string) cacheFile {
 	return out
 }
 
-// equal compares by signature; bodies never change under an unchanged one.
+// equal compares by signature and PR links; bodies never change under an
+// unchanged signature, but links can be added without one.
 func (c cacheFile) equal(entries map[string]cacheEntry) bool {
 	if len(c.Entries) != len(entries) {
 		return false
 	}
 	for id, entry := range entries {
-		if existing, ok := c.Entries[id]; !ok || existing.Signature != entry.Signature {
+		if existing, ok := c.Entries[id]; !ok || existing.Signature != entry.Signature || !reflect.DeepEqual(existing.Session.PRLinks, entry.Session.PRLinks) {
 			return false
 		}
 	}

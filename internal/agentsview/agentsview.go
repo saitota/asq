@@ -162,6 +162,7 @@ func (b Client) build(bin string, listed []listedSession, cached cacheFile) (map
 			Name:      item.DisplayName,
 			CWD:       item.CWD,
 			GitBranch: item.GitBranch,
+			PRLinks:   item.prLinks(),
 			Timestamp: item.time(),
 			Messages:  messages,
 			Errors:    errs,
@@ -226,17 +227,36 @@ type listResponse struct {
 }
 
 type listedSession struct {
-	ID                 string `json:"id"`
-	Agent              string `json:"agent"`
-	DisplayName        string `json:"display_name"`
-	FirstMessage       string `json:"first_message"`
-	StartedAt          string `json:"started_at"`
-	EndedAt            string `json:"ended_at"`
-	MessageCount       int    `json:"message_count"`
-	CWD                string `json:"cwd"`
-	GitBranch          string `json:"git_branch"`
-	SourceSessionID    string `json:"source_session_id"`
-	TranscriptRevision string `json:"transcript_revision"`
+	ID                 string         `json:"id"`
+	Agent              string         `json:"agent"`
+	DisplayName        string         `json:"display_name"`
+	FirstMessage       string         `json:"first_message"`
+	StartedAt          string         `json:"started_at"`
+	EndedAt            string         `json:"ended_at"`
+	MessageCount       int            `json:"message_count"`
+	CWD                string         `json:"cwd"`
+	GitBranch          string         `json:"git_branch"`
+	SourceSessionID    string         `json:"source_session_id"`
+	TranscriptRevision string         `json:"transcript_revision"`
+	PRLinks            []listedPRLink `json:"pr_links"`
+}
+
+type listedPRLink struct {
+	URL        string `json:"url"`
+	Host       string `json:"host"`
+	Repository string `json:"repository"`
+	Number     int    `json:"number"`
+}
+
+func (item listedSession) prLinks() []session.PRLink {
+	if len(item.PRLinks) == 0 {
+		return nil
+	}
+	out := make([]session.PRLink, len(item.PRLinks))
+	for i, link := range item.PRLinks {
+		out[i] = session.PRLink{URL: link.URL, Host: link.Host, Repository: link.Repository, Number: link.Number}
+	}
+	return out
 }
 
 // rawID recovers the id the agent's own CLI resumes with. source_session_id

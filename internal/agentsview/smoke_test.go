@@ -11,7 +11,7 @@ import (
 )
 
 // TestSmokeAgainstRealAgentsview guards the contract this package assumes of
-// the real agentsview CLI: the list JSON shape and the "<agent>:<id>" id
+// the real agentsview CLI: the list JSON shape (including pr_links) and the "<agent>:<id>" id
 // namespacing. It only runs when ASQ_AGENTSVIEW_SMOKE=1 and agentsview is on
 // PATH, because it reads the developer's actual session store.
 func TestSmokeAgainstRealAgentsview(t *testing.T) {
@@ -45,6 +45,16 @@ func TestSmokeAgainstRealAgentsview(t *testing.T) {
 			t.Fatalf("listed session missing timestamps: %+v", item)
 		}
 	}
+	linked := 0
+	for _, item := range listed {
+		for _, link := range item.PRLinks {
+			if link.URL == "" || link.Repository == "" || link.Number <= 0 {
+				t.Fatalf("pr_links entry of %s missing url, repository or number: %+v", item.ID, link)
+			}
+			linked++
+		}
+	}
+	t.Logf("smoke: %d pr_links entries", linked)
 	// Fetch the longest conversation so the ordinal paging contract
 	// (last_ordinal advancing across full pages) is exercised for real.
 	longest := listed[0]

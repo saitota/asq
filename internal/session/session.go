@@ -1,6 +1,7 @@
 package session
 
 import (
+	"strconv"
 	"strings"
 	"time"
 )
@@ -20,6 +21,14 @@ type Message struct {
 	Timestamp time.Time
 }
 
+// PRLink is a pull request agentsview linked to the session.
+type PRLink struct {
+	URL        string
+	Host       string
+	Repository string
+	Number     int
+}
+
 type Session struct {
 	ID        string
 	Source    Source
@@ -27,6 +36,7 @@ type Session struct {
 	CWD       string
 	GitBranch string
 	Timestamp time.Time
+	PRLinks   []PRLink
 	Messages  []Message
 	Errors    []string
 }
@@ -131,4 +141,23 @@ func (s Session) SearchText(limit int) string {
 		}
 	}
 	return out.String()
+}
+
+// PRSearchText lists every spelling a linked PR can be searched by:
+// owner/repo#N, #N, pull/N and the URL.
+func (s Session) PRSearchText() string {
+	parts := make([]string, 0, len(s.PRLinks)*3)
+	for _, link := range s.PRLinks {
+		if link.Number > 0 {
+			ref := "#" + strconv.Itoa(link.Number)
+			if link.Repository != "" {
+				ref = link.Repository + ref
+			}
+			parts = append(parts, ref, "pull/"+strconv.Itoa(link.Number))
+		}
+		if link.URL != "" {
+			parts = append(parts, link.URL)
+		}
+	}
+	return strings.Join(parts, " ")
 }
