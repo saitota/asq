@@ -46,3 +46,4 @@ agentsview が `pr_links` として持つ、セッションに連携した PR �
 
 - `NO_COLOR` があれば色を付けない。表は出力先が端末の時だけ色を付ける
 - エージェントの色は `source` の登録簿、無ければ agentsview の配色、それも無ければ灰色
+- 色は `ansitext.RGB` で持ち、SGR への変換は `ansitext.Paint`・`PaintOn` だけが行う

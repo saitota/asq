@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"github.com/saitota/asq/internal/ansitext"
 	"os"
 	"strings"
 
@@ -19,7 +20,7 @@ func colorSource(src session.Source, value string) string {
 	if !colorEnabled() {
 		return value
 	}
-	return "\x1b[" + source.ANSIColor(src) + "m" + value + "\x1b[0m"
+	return ansitext.Paint(source.Color(src), value)
 }
 
 func colorSourceInLabel(label string, src session.Source) string {
