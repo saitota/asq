@@ -7,7 +7,8 @@ import (
 )
 
 // sanitizeDisplay removes ANSI sequences and control characters that session
-// content could otherwise inject into the picker UI.
+// content could otherwise inject into the terminal, and turns tabs into spaces
+// so TSV columns stay aligned.
 func sanitizeDisplay(value string) string {
 	return strings.Map(func(r rune) rune {
 		if r == '\t' {
