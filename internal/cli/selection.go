@@ -53,12 +53,12 @@ func newSelectionLine(sess session.Session, color bool) selectionLine {
 	return selectionLine{
 		Source:     source,
 		Time:       sessionTime(sess),
-		Name:       sess.Name,
-		CWD:        sess.CWD,
-		GitBranch:  sess.GitBranch,
-		Snippet:    sess.Snippet(fzfSnippetLimit),
-		ID:         sess.ID,
-		SearchText: strings.TrimSpace(ansitext.Strip(sess.PRSearchText() + " " + sess.SearchText(fzfSearchTextLimit))),
+		Name:       sanitizeDisplay(sess.Name),
+		CWD:        sanitizeDisplay(sess.CWD),
+		GitBranch:  sanitizeDisplay(sess.GitBranch),
+		Snippet:    sanitizeDisplay(sess.Snippet(fzfSnippetLimit)),
+		ID:         sanitizeDisplay(sess.ID),
+		SearchText: strings.TrimSpace(sanitizeDisplay(sess.PRSearchText() + " " + sess.SearchText(fzfSearchTextLimit))),
 	}
 }
 
