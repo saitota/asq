@@ -1,10 +1,10 @@
 package source
 
 import (
-	"github.com/saitota/asq/internal/ansitext"
 	"slices"
 	"testing"
 
+	"github.com/saitota/asq/internal/ansitext"
 	"github.com/saitota/asq/internal/session"
 )
 
@@ -31,7 +31,7 @@ func TestGetUnknownSource(t *testing.T) {
 		t.Fatal("expected unknown source to miss")
 	}
 	if got := Color("bogus"); got != DefaultColor {
-		t.Fatalf("expected default color, got %q", got)
+		t.Fatalf("expected default color, got %v", got)
 	}
 	if cmd, args, err := Resume("bogus", "id"); err == nil || cmd != "" || args != nil {
 		t.Fatalf("expected unsupported error, got %q %v %v", cmd, args, err)
@@ -41,7 +41,7 @@ func TestGetUnknownSource(t *testing.T) {
 func TestNonResumableAgentsStillGetAccentColors(t *testing.T) {
 	for _, agent := range []string{"cowork", "qwen", "kimi"} {
 		if got := Color(session.Source(agent)); got == DefaultColor {
-			t.Fatalf("%s: expected an accent color, got %q", agent, got)
+			t.Fatalf("%s: expected an accent color, got %v", agent, got)
 		}
 		if _, _, err := Resume(session.Source(agent), "id"); err == nil {
 			t.Fatalf("%s: expected resume to be unsupported", agent)
@@ -49,7 +49,7 @@ func TestNonResumableAgentsStillGetAccentColors(t *testing.T) {
 	}
 	// aider has no agentsview accent; it takes the gray default.
 	if got := Color("aider"); got != DefaultColor {
-		t.Fatalf("aider: expected default color, got %q", got)
+		t.Fatalf("aider: expected default color, got %v", got)
 	}
 }
 
@@ -116,7 +116,7 @@ func TestTableFollowsAgentsview(t *testing.T) {
 	}
 	for agent, want := range colors {
 		if got := Color(agent); got != want {
-			t.Fatalf("%s: color = %q, want %q", agent, got, want)
+			t.Fatalf("%s: color = %v, want %v", agent, got, want)
 		}
 	}
 }

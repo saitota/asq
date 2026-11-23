@@ -1,10 +1,10 @@
 package cli
 
 import (
-	"github.com/saitota/asq/internal/ansitext"
 	"os"
 	"strings"
 
+	"github.com/saitota/asq/internal/ansitext"
 	"github.com/saitota/asq/internal/session"
 	"github.com/saitota/asq/internal/source"
 )

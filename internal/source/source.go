@@ -6,10 +6,10 @@ package source
 
 import (
 	"fmt"
-	"github.com/saitota/asq/internal/ansitext"
 	"regexp"
 	"strings"
 
+	"github.com/saitota/asq/internal/ansitext"
 	"github.com/saitota/asq/internal/session"
 )
 
@@ -135,7 +135,7 @@ var DefaultColor = ansitext.RGB{209, 213, 219}
 // extraColors are agentsview's own dark-theme agent accents, from
 // KNOWN_AGENTS in frontend/src/lib/utils/agents.ts with hex values resolved
 // via frontend/src/app.css and kit-ui/src/lib/brand.css. Agents without an
-// agentsview color fall back to DefaultANSIColor gray. Claude, Codex, Cursor
+// agentsview color fall back to DefaultColor gray. Claude, Codex, Cursor
 // and Copilot keep asq's established colors instead.
 var extraColors = map[session.Source]ansitext.RGB{
 	"visualstudio-copilot": {96, 165, 250}, // blue

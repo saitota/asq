@@ -2,9 +2,9 @@ package cli
 
 import (
 	"fmt"
-	"github.com/saitota/asq/internal/ansitext"
 	"strings"
 
+	"github.com/saitota/asq/internal/ansitext"
 	"github.com/saitota/asq/internal/session"
 	"github.com/saitota/asq/internal/source"
 )
