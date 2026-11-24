@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/saitota/asq/internal/ansitext"
 	"github.com/saitota/asq/internal/session"
 	"github.com/saitota/asq/internal/source"
 )
@@ -22,30 +23,26 @@ const previewMessageCharLimit = 2000
 // styles across a wrap point, but this package intentionally stays within
 // the single-style-per-line subset so the two packages' contract stays
 // simple and easy to verify by inspection.
-const previewMetaBg = "156;163;175"
-const previewMetaFg = "17;24;39"
+var previewMetaBg = ansitext.RGB{156, 163, 175}
+var previewMetaFg = ansitext.RGB{17, 24, 39}
 
-func previewBar(bgRGB, value string) string {
-	return "\x1b[48;2;" + bgRGB + ";38;2;" + previewMetaFg + "m" + value + "\x1b[0m"
+func previewBar(bg ansitext.RGB, value string) string {
+	return ansitext.PaintOn(bg, previewMetaFg, value)
 }
 
 func previewMetaLine(value string) string {
-	return "\x1b[38;2;" + previewMetaBg + "m" + value + "\x1b[0m"
-}
-
-func sourceRGB(src session.Source) string {
-	return strings.TrimPrefix(source.ANSIColor(src), "38;2;")
+	return ansitext.Paint(previewMetaBg, value)
 }
 
 type previewStyle struct {
 	meta func(text string) string
-	bar  func(rgb, text string) string
+	bar  func(bg ansitext.RGB, text string) string
 	body func(text string) string
 }
 
 var plainPreviewStyle = previewStyle{
 	meta: func(text string) string { return text },
-	bar:  func(_, text string) string { return text },
+	bar:  func(_ ansitext.RGB, text string) string { return text },
 	body: func(text string) string { return text },
 }
 
@@ -69,7 +66,7 @@ func renderPreview(sess session.Session, style previewStyle) string {
 		_, _ = fmt.Fprintf(&out, "%s\n", style.meta("warning: "+warning))
 	}
 	_, _ = fmt.Fprintf(&out, "%s\n\n", style.meta("updated: "+tableTime(sess)))
-	srcRGB := sourceRGB(sess.Source)
+	srcColor := source.Color(sess.Source)
 	for i, msg := range sess.Messages {
 		if i >= previewMessageLimit {
 			_, _ = fmt.Fprintf(&out, "%s\n", style.meta(fmt.Sprintf("... %d more messages", len(sess.Messages)-i)))
@@ -79,12 +76,12 @@ func renderPreview(sess session.Session, style previewStyle) string {
 		if text == "" {
 			continue
 		}
-		barRGB := srcRGB
+		barColor := srcColor
 		if msg.Role == session.RoleUser {
-			barRGB = previewMetaBg
+			barColor = previewMetaBg
 		}
 		header := fmt.Sprintf("[%d] %s %s", i+1, msg.Role, tableTime(session.Session{Timestamp: msg.Timestamp}))
-		_, _ = fmt.Fprintf(&out, "%s\n", style.bar(barRGB, header))
+		_, _ = fmt.Fprintf(&out, "%s\n", style.bar(barColor, header))
 		_, _ = fmt.Fprintln(&out, style.body(truncateRunes(text, previewMessageCharLimit)))
 		_, _ = fmt.Fprintln(&out)
 	}

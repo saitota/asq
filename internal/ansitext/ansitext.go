@@ -5,6 +5,7 @@
 package ansitext
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 	"unicode/utf8"
@@ -241,4 +242,22 @@ func (a *activeStyles) empty() bool {
 
 func (a *activeStyles) reopen() string {
 	return strings.Join(a.sequences, "")
+}
+
+// RGB is a 24-bit color.
+type RGB [3]uint8
+
+func (c RGB) params(prefix int) string {
+	return fmt.Sprintf("%d;2;%d;%d;%d", prefix, c[0], c[1], c[2])
+}
+
+// Paint wraps value in a foreground color and closes it with a reset.
+func Paint(fg RGB, value string) string {
+	return "\x1b[" + fg.params(38) + "m" + value + resetSequence
+}
+
+// PaintOn wraps value in a background and foreground color and closes it with
+// a reset.
+func PaintOn(bg, fg RGB, value string) string {
+	return "\x1b[" + bg.params(48) + ";" + fg.params(38) + "m" + value + resetSequence
 }

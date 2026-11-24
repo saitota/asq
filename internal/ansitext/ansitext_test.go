@@ -148,3 +148,14 @@ func TestSequenceLenMatchesCSISequenceOnly(t *testing.T) {
 		t.Fatalf("SequenceLen(plain text) = %d, want 0", got)
 	}
 }
+
+// The expected bytes are the literal sequences cli emitted before colors moved
+// to RGB, so a change here changes the picker, preview and --fzf output.
+func TestPaintBytes(t *testing.T) {
+	if got, want := Paint(RGB{245, 158, 11}, "claude"), "\x1b[38;2;245;158;11mclaude\x1b[0m"; got != want {
+		t.Fatalf("Paint = %q, want %q", got, want)
+	}
+	if got, want := PaintOn(RGB{156, 163, 175}, RGB{17, 24, 39}, "[1] user"), "\x1b[48;2;156;163;175;38;2;17;24;39m[1] user\x1b[0m"; got != want {
+		t.Fatalf("PaintOn = %q, want %q", got, want)
+	}
+}

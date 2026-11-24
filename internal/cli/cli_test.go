@@ -473,7 +473,7 @@ func TestPreviewStyleHelpersEmitAtMostOneOpenStyle(t *testing.T) {
 }
 
 func TestSelectionKeyStripsANSI(t *testing.T) {
-	selection := "\x1b[38;2;96;165;250mcodex\x1b[0m\t2026-01-01T00:00:00Z\tSession name\t/tmp/proj\tmain\thello\tuser hello\tsid"
+	selection := ansitext.Paint(ansitext.RGB{96, 165, 250}, "codex") + "\t2026-01-01T00:00:00Z\tSession name\t/tmp/proj\tmain\thello\tuser hello\tsid"
 	if got := selectionKeyFromSelection(selection); got != "sid" {
 		t.Fatalf("selectionKeyFromSelection = %q", got)
 	}
@@ -620,7 +620,7 @@ func TestPickerLineUsesColorMarkerAndBudgets(t *testing.T) {
 	if strings.Contains(line, "claude") {
 		t.Fatalf("picker line should encode the source as color, got %q", line)
 	}
-	if !strings.Contains(line, "●") || !strings.Contains(line, source.ANSIColor(source.Claude)) {
+	if !strings.Contains(line, ansitext.Paint(source.Color(source.Claude), "●")) {
 		t.Fatalf("picker line missing colored marker: %q", line)
 	}
 	if !strings.Contains(line, "...") {
@@ -656,12 +656,11 @@ func TestPickerPreviewTextDrawsMetaBars(t *testing.T) {
 		},
 	}
 	got := pickerPreviewText(sess)
-	claudeRGB := strings.TrimPrefix(source.ANSIColor(source.Claude), "38;2;")
 	for _, want := range []string{
-		"\x1b[38;2;" + previewMetaBg + "mclaude sid\x1b[0m",
-		"\x1b[38;2;" + previewMetaBg + "mname: Named\x1b[0m",
-		"\x1b[48;2;" + previewMetaBg + ";38;2;" + previewMetaFg + "m[1] user",
-		"\x1b[48;2;" + claudeRGB + ";38;2;" + previewMetaFg + "m[2] assistant",
+		ansitext.Paint(previewMetaBg, "claude sid"),
+		ansitext.Paint(previewMetaBg, "name: Named"),
+		strings.TrimSuffix(ansitext.PaintOn(previewMetaBg, previewMetaFg, "[1] user"), "\x1b[0m"),
+		strings.TrimSuffix(ansitext.PaintOn(source.Color(source.Claude), previewMetaFg, "[2] assistant"), "\x1b[0m"),
 	} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("preview missing %q:\n%s", want, got)
