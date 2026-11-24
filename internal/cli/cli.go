@@ -158,7 +158,7 @@ func (a App) list(args []string) error {
 			continue
 		}
 		if *verbose {
-			_, _ = fmt.Fprintf(a.Stdout, "%s\t%s\t%s\t%s\t%s\t%s\n", sess.Source, sessionTime(sess), sess.Name, sess.ID, sess.CWD, sess.GitBranch)
+			_, _ = fmt.Fprintf(a.Stdout, "%s\t%s\t%s\t%s\t%s\t%s\n", sess.Source, sessionTime(sess), sanitizeDisplay(sess.Name), sanitizeDisplay(sess.ID), sanitizeDisplay(sess.CWD), sanitizeDisplay(sess.GitBranch))
 			continue
 		}
 	}

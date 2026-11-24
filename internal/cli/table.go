@@ -49,10 +49,10 @@ func writeSessionTable(w io.Writer, sessions []session.Session) error {
 		}
 		rows = append(rows, []string{
 			label,
-			ansitext.TruncateEnd(sess.Name, layout.NameWidth),
-			ansitext.TruncateMiddle(tildePath(sess.CWD), layout.PathWidth),
+			ansitext.TruncateEnd(sanitizeDisplay(sess.Name), layout.NameWidth),
+			ansitext.TruncateMiddle(sanitizeDisplay(tildePath(sess.CWD)), layout.PathWidth),
 			tableTime(sess),
-			ansitext.TruncateEnd(sess.Snippet(layout.SnippetWidth*tableSnippetPreTruncateMultiplier), layout.SnippetWidth),
+			ansitext.TruncateEnd(sanitizeDisplay(sess.Snippet(layout.SnippetWidth*tableSnippetPreTruncateMultiplier)), layout.SnippetWidth),
 		})
 	}
 	t := table.New().
@@ -155,10 +155,10 @@ func sessionLabel(sess session.Session, current session.CWDMatcher) string {
 	}
 	label := marker + string(sess.Source)
 	if short := shortID(sess.ID); short != "" {
-		label += " " + short
+		label += " " + sanitizeDisplay(short)
 	}
 	if sess.GitBranch != "" {
-		label += " " + sess.GitBranch
+		label += " " + sanitizeDisplay(sess.GitBranch)
 	}
 	return label
 }
